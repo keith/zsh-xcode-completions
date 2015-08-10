@@ -1,0 +1,19 @@
+#compdef xcode-select
+
+_arguments \
+  '(-h --help)'{-h,--help}'[Print the usage message]' \
+  '(-p --print-path)'{-p,--print-path}'[Prints the current developer directory]' \
+  '(-r --reset)'{-r,--reset}'[Unsets any user-specified developer directory]' \
+  '(-s --switch)'{-s,--switch}'[Set the active developer directory]:Set active developer directory:->switch' \
+  '(-v --version)'{-v,--version}'[Prints the xcode-select version]' \
+  '--install[Opens UI to install the command line tools]:Installs command line tools'
+
+case "$state" in
+  switch)
+    local -a xcodes
+    xcodes=(/Applications/Xcode*.app)
+    if [[ $xcodes != "" ]]; then
+      _values "Available Xcodes" $xcodes
+    fi
+    ;;
+esac
