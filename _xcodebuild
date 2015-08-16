@@ -1,8 +1,5 @@
 #compdef xcodebuild
 
-# TODO
-# -destination
-
 _archs() {
   local -a archs
   archs=$(xcodebuild -showBuildSettings 2>/dev/null | grep VALID_ARCHS \
@@ -64,6 +61,7 @@ _arguments \
   '-configuration[Build configuration to use]:Build configuration to use:->configurations' \
   '-derivedDataPath[Overrides derived data directory]:Overrides derived data directory:_directories' \
   '-destination-timeout[Device search timeout]:Device search timeout' \
+  '-destination[Device destination settings]:Device destination settings:' \
   '-exportArchive[Exports an archive]' \
   '-exportFormat[Format for archive]:Format for archive:(IPA PKG APP)' \
   '-exportInstallerIdentity[Installer identity for archiving]:Installer identity for archiving' \
