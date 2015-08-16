@@ -19,7 +19,6 @@ _schemes() {
   local -a schemes
   schemes=$(xcodebuild -list 2>/dev/null \
     | sed -e '1,/Schemes:/d' -e 's/^[ \t]*//')
-
   echo $schemes
 }
 
@@ -54,7 +53,7 @@ _actions() {
 
 _arguments \
   '(-n -dry-run)'{-n,-dry-run}'[Print but do not execute commands]' \
-  '*:: :->actions' \
+  '*: :->actions' \
   '-alltargets[Build all targets in the specified project]' \
   '-arch[Architecture to build]:Architecture to build:->archs' \
   '-archivePath[Archive Path]:Archive Path:_directories' \
