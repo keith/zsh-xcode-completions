@@ -1,0 +1,18 @@
+#compdef genstrings
+
+_arguments \
+  '*: :->files' \
+  '-a[Appends output to old files]' \
+  '-macRoman[Read source files with Mac Roaman encoding]' \
+  '-noPositionalParameters[Turns off positional parameters]' \
+  '-o[Output directory for tables]:Tables output directory:->files' \
+  '-q[Turns off key/value pairs warning]' \
+  '-s[Specify custom NSLocalizedString function]:Custom function name:' \
+  '-skipTable[Skip over specified table]:Table to skip over:' \
+  '-u[Allows unicode in strings files]'
+
+case "$state" in
+  files)
+    _files
+    ;;
+esac

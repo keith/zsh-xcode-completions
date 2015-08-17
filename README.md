@@ -2,6 +2,7 @@
 
 Zsh completions for some of the Xcode command line tools. Currently:
 
+- [genstrings](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html)
 - [nm](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/nm.1.html)
 - [strings](http://linux.die.net/man/1/strings) (but the OS X version)
 - [xcode-select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
@@ -15,8 +16,6 @@ brew install keith/formulae/zsh-xcode-completions
 
 # TODO:
 
-- arch
-- genstrings
 - lipo
 - otool
 - pkgutil
