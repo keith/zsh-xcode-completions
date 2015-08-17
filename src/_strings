@@ -1,0 +1,26 @@
+#compdef strings
+
+_arguments \
+  '*: :->files' \
+  '-[Search all bytes of file]' \
+  '-a[Search al sections of object file]' \
+  '-arch[Architecture type]:Architecture for use on universal files:->archs' \
+  '-n[Minimum string length]:Minimum string length:' \
+  '-o[Write offset in file before string]' \
+  '-t[Write offset in file with given format]:Offset format:(d o x)'
+
+case "$state" in
+  archs)
+    archs=( \
+      "arm64" \
+      "armv7" \
+      "armv7s" \
+      "i386" \
+      "x86_64" \
+    )
+    _values "Architecture for use on universal files" $archs
+    ;;
+  files)
+    _files
+    ;;
+esac
