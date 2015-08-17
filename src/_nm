@@ -1,0 +1,38 @@
+#compdef nm
+
+_arguments \
+  '*: :->files' \
+  '-a[Display all symbol table entries (including debuggers)]' \
+  '-A[Write path/library name on each line]' \
+  '-arch[Architecture type]:Architecture for use on universal files:->archs' \
+  '-f[Display symbol table flat]' \
+  '-g[Display only global symbols]' \
+  '-j[Display only symbol names]' \
+  '-l[List a pseudo symbol if there is no section start symbol]' \
+  '-m[See `man nm`]' \
+  '-n[Sort numerically]' \
+  '-o[Prepend file/archive name to each line]' \
+  '-p[Do not sort, show in symbol table order]' \
+  '-P[Write in a portable output format]' \
+  '-r[Sort in reverse order]' \
+  '-t[Numeric output format]:Numeric output format:(d o x)' \
+  '-u[Display only undefined symbols]' \
+  '-U[Do not display undefined symbols]' \
+  '-s[List only symbols in specific section]:List only specific symbols:' \
+  '-x[Display entries in hex along with names]'
+
+case "$state" in
+  archs)
+    archs=( \
+      "arm64" \
+      "armv7" \
+      "armv7s" \
+      "i386" \
+      "x86_64" \
+    )
+    _values "Architecture for use on universal files" $archs
+    ;;
+  files)
+    _files
+    ;;
+esac
