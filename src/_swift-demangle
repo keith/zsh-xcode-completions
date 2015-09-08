@@ -1,0 +1,13 @@
+#compdef swift-demangle
+
+_arguments \
+  '*:Symbol(s):->' \
+  '-compact[Only print demangled names]' \
+  '-expand[Show expanded node structure]' \
+  '-help-list-hidden[Show all help options]' \
+  '-help[Show help]' \
+  '-no-sugar[Do not show language syntactic sugar]' \
+  '-simplified[Do not display module names or implicit self types]' \
+  '-test-remangle[Remangle the string]' \
+  '-tree-only[Only show details tree]' \
+  '-version[Print version]'
