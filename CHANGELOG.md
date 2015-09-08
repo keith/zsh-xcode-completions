@@ -3,6 +3,7 @@
 ### Added
 
 - `swift-demangle` shim
+- `--without-shims` homebrew flag
 - `swift-demangle` completion
 - `xcrun` completion
 
