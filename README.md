@@ -22,6 +22,7 @@ brew install keith/formulae/zsh-xcode-completions
 - lipo
 - otool
 - pkgutil
+- pmset
 
 ### Shims
 
