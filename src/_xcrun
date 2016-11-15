@@ -41,9 +41,9 @@ case "$state" in
     fi
     ;;
   toolchains)
-    toolchains=($(ls $(xcode-select -p)/Toolchains/*.xctoolchain))
+    toolchains=(/Applications/Xcode*.app/Contents/Developer/Toolchains/*.xctoolchain)
     if [[ $toolchains != "" ]]; then
-      _values "Toolchains" $toolchains
+      _values "Toolchain" $toolchains
     fi
     ;;
 esac
