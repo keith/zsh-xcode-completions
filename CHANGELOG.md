@@ -1,3 +1,17 @@
+## master
+
+### Added
+
+- `plutil` completion
+
+### Changed
+
+None.
+
+### Fixed
+
+None.
+
 ## 1.2.0
 
 ### Added
