@@ -61,6 +61,10 @@ _arguments \
   '-derivedDataPath[Overrides derived data directory]:Overrides derived data directory:_directories' \
   '-destination-timeout[Device search timeout]:Device search timeout' \
   '-destination[Device destination settings]:Device destination settings:' \
+  '-enableAddressSanitizer[Turn the address sanitizer on/off]:enabled:(YES NO)' \
+  '-enableThreadSanitizer[Turn the thread sanitizer on/off]:enabled:(YES NO)' \
+  '-enableUndefinedBehaviorSanitizer[Turn the UB sanitizer on/off]:enabled:(YES NO)' \
+  '-enableCodeCoverage[Turn code coverage on/off]:enabled:(YES NO)' \
   '-exportArchive[Exports an archive]' \
   '-exportFormat[Format for archive]:Format for archive:(IPA PKG APP)' \
   '-exportInstallerIdentity[Installer identity for archiving]:Installer identity for archiving' \
