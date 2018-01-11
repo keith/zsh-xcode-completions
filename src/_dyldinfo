@@ -1,0 +1,15 @@
+#compdef dyldinfo
+
+# left out: -dr -export_dot -data_in_code
+_arguments \
+  '*:mach-o file:_files' \
+  '-arch[selected architecture]:arch:(i386 x86_64 armv7 arm64)' \
+  '-dylibs[print dylib dependencies]' \
+  '-rebase[print addresses needing rebasing]' \
+  '-bind[print global variable bindings]' \
+  '-weak_bind[print coalesced (weak) bindings]' \
+  '-lazy_bind[print function (lazy) bindings]' \
+  '-export[print exported symbols]' \
+  '-opcodes[print dyld binding and rebase opcodes]' \
+  '-function_starts[print starts of functions]'
+  
