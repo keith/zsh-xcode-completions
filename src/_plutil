@@ -1,26 +1,29 @@
 #compdef plutil
 
+readonly formats=(json xml1 binary1)
+readonly flags=(
+  -bool
+  -integer
+  -float
+  -string
+  -date
+  -data
+  -xml
+  -json
+)
+
 _arguments \
-  '*: :->files' \
-  '-convert[Target format]:The format to convert the plist to:->format' \
-  '-e[Output extension]:The extension for the output file:' \
-  '-help[Show usage information]' \
+  '*:file:_files' \
+  "-convert[Target format]:format:($formats)" \
+  "-insert[Add value for keypath]:keypath: :data type:($flags):value: " \
+  "-replace[Change value for keypath]:keypath: :data type:($flags):value: " \
+  '-remove[Remove value at keypath]:keypath: ' \
+  "-extract[Create sub-plist]:keypath: :format:($formats)" \
+  '-e[Output extension]:The extension for the output file: ' \
+  '(* -)-help[Show usage information]' \
   '-lint[Check the plist for syntax errors]' \
-  '-o[Output path]:The output path of the converted plist:->files' \
+  '-o[Output path]:The output path of the converted plist:_files' \
   '-p[Print the plist as human readable text]' \
   '-r[Make JSON output human readable]' \
   '-s[Do not print on success]'
 
-case "$state" in
-  format)
-    formats=( \
-      "xml1" \
-      "binary1" \
-      "json" \
-    )
-    _values "Format to convert the plist to" $formats
-    ;;
-  files)
-    _files
-    ;;
-esac
