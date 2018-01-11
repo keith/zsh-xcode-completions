@@ -1,0 +1,33 @@
+#compdef instruments
+
+_instruments_templates() {
+  if ! _retrieve_cache _instruments_templates; then
+    # The output format of `instruments -s templates` is one template per line.
+    # Each template name is contained in double quotes.
+    #   ${(f)...} splits by line
+    #   ${(Q)...} strips quotes
+    local -a template_list
+    template_list=(${(Q)${(f)"$(_call_program templates 'instruments -s templates 2>/dev/null')"}})
+    # Remove the output's heading ("Known Templates").
+    shift template_list
+    _store_cache _instruments_templates template_list
+  fi
+  
+  _describe -t instruments-templates 'Instruments Templates' template_list "$@"
+}
+
+# TODO: Provide completion for device/simulator
+# TODO: Handle -e for target process environment variables
+_arguments \
+   '-w[target device or simulator]:target: ' \
+   '-v[enable verbose logging]' \
+   '-t[template]:template:_instruments_templates' \
+   '-s[list known templates or devices]:type:(templates devices)' \
+   '-D[output path for trace document]:output file:_files' \
+   '-l[limit recording time]:time limit (ms): ' \
+   '-i[index of the instrument to apply target data to]:index: ' \
+   - pid \
+   '-p[process id to attach to]:pids:_pids' \
+   - command \
+   ':command: _command_names -e' \
+   '*::arguments: _normal'
