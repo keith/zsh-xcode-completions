@@ -11,6 +11,7 @@ Zsh completions for some of the Xcode command line tools. Currently:
 - `strings`
 - `swift-demangle`
 - `swift`
+- `lipo`
 
 # Installation
 
@@ -20,7 +21,6 @@ brew install keith/formulae/zsh-xcode-completions
 
 # TODO:
 
-- lipo
 - otool
 - pkgutil
 - pmset
