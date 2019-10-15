@@ -1,0 +1,43 @@
+#compdef lipo
+
+# TODO: Allow archs to be zstyle overridable.
+local archs="i386 x86_64 x86_64h armv7 arm64 arm64e"
+
+# TODO: Filter completed archs to exclude those already on the command line.
+# Ex: `lipo -remove x86_64 -remove <TAB>`
+# This would complete all archs except x86_64.
+
+# TODO: Complete fat/thin mach-o files only, not all `_files`
+
+# TODO: Handle variadics input for -verify_arch
+# This flag is for scripting (returns zero/non-zero). Supporting completion of
+# many arguments doesn't seem like a practical need.
+
+# TODO: Unsupported (rarely needed?) options:
+# * -create -arch_blank <arch>
+# * -arch
+# * -hideARM64
+# * -segalign
+
+_arguments : \
+  '-output[path of created universal binary]:output file:_files' \
+  '*:input mach-o binaries:_files' \
+  - archs \
+  '-archs[list architectures present]' \
+  - create \
+  '-create[create a new universal binary]' \
+  - "detailed info" \
+  '-detailed_info[display detailed list of architectures]' \
+  - extract \
+  "*-extract[create a single architecture universal binary]:architecture type:($archs)" \
+  "*-extract_family[create a universal binary containing an architecture family]:architecture type:($archs)" \
+  - info \
+  '-info[display brief description of each input file]' \
+  - remove \
+  "*-remove[remove an architecture from a universal binary]:architecture type:($archs)" \
+  - replace \
+  "*-replace[replace an architecture in a universal binary]:architecture type:($archs):replacement:_files" \
+  - thin \
+  "-thin[create a non-universal (mach-o) binary of a given architecture]:architecture type:($archs)" \
+  - verify \
+  "-verify_arch[confirm the universal binary contains the specified arch(s)]:architecture type:($archs)"
