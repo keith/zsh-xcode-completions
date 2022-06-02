@@ -25,7 +25,7 @@ _arguments \
 
 case "$state" in
   executables)
-    PATH="$(dirname "$(xcrun -f swift)")" _command_names -e
+    PATH="$(dirname "$(xcrun -f swift)")":"$(dirname "$(xcrun -f simctl)")" _command_names -e
     ;;
   sdks)
     if ([[ ${+installed_sdks_platforms} -eq 0 ]] || _cache_invalid SDK_PLATFORMS) && ! _retrieve_cache SDK_PLATFORMS; then
