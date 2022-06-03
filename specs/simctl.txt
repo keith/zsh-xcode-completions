@@ -1,4 +1,4 @@
-xcrun simctl
+xcrun simctl || true
 usage: simctl [--set <path>] [--profiles <path>] <subcommand> ...
        simctl help [subcommand]
 Command line utility to control the Simulator
@@ -44,3 +44,7 @@ Subcommands:
 	push                Send a simulated push notification
 	privacy             Grant, revoke, or reset privacy and permissions
 	keychain            Manipulate a device's keychain
+
+xcrun simctl help help
+Prints the usage for a given subcommand.
+Usage: simctl help <subcommand>

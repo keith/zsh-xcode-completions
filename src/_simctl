@@ -1,5 +1,27 @@
 #compdef simctl
 
-_arguments \
-  '--set: :_files -/' \
-  '--profiles: :_files -/' \
+_simctl() {
+  _arguments \
+    '--set: :_files -/' \
+    '--profiles: :_files -/' \
+    ': :_commands' \
+    '*:: :_options'
+}
+
+_commands() {
+  local -a commands
+  commands=(
+    'help:Prints the usage for a given subcommand.'
+  )
+  _describe subcommand commands
+}
+
+_options() {
+  case $line[1] in
+
+    (help)
+      _arguments ': :_commands'
+      ;;
+
+  esac
+}

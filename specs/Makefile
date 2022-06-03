@@ -1,9 +1,11 @@
 all: simctl.txt
 
 %.txt: FORCE
-	$(MAKE) "$(basename $@)" >$@
+	$(MAKE) "$(basename $@)" &>$@
 
 FORCE:
 
 simctl:
-	-xcrun simctl
+	xcrun simctl || true
+	@echo
+	-xcrun simctl help help
