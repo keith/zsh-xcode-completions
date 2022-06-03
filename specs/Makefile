@@ -9,3 +9,5 @@ simctl:
 	xcrun simctl || true
 	@echo
 	-xcrun simctl help help
+	@echo
+	-xcrun simctl help create

@@ -12,6 +12,7 @@ _commands() {
   local -a commands
   commands=(
     'help:Prints the usage for a given subcommand.'
+    'create:Create a new device.'
   )
   _describe subcommand commands
 }
@@ -23,5 +24,21 @@ _options() {
       _arguments ': :_commands'
       ;;
 
+    (create)
+      _arguments ':name:' ':device type id:_devicetypes' '::runtime id:_runtimes'
+      ;;
+
   esac
+}
+
+_devicetypes() {
+  local -a devicetypes
+  devicetypes=(${(f)"$(xcrun simctl list devicetypes -j | jq -r '.devicetypes[].name')"})
+  _describe devicetype devicetypes
+}
+
+_runtimes() {
+  local -a runtimes
+  runtimes=(${(f)"$(xcrun simctl list runtimes --json | jq -r '.runtimes[].identifier')"})
+  _describe runtime runtimes
 }
