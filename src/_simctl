@@ -1,0 +1,5 @@
+#compdef simctl
+
+_arguments \
+  '--set: :_files -/' \
+  '--profiles: :_files -/' \
