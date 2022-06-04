@@ -43,14 +43,14 @@ _options() {
 
     (clone)
       _arguments \
-        ':device:{FILTER=available _devices}' \
+        ':device:{FILTER=available_shutdown _devices}' \
         ':name:' \
         '::destination device set:_files -/'
       ;;
 
     (upgrade)
       _arguments \
-        ':device:_devices' \
+        ':device:{FILTER=shutdown _devices}' \
         ':runtime id:{DEVICE=${(Q)words[2]} _runtimes}'
       ;;
 
@@ -70,16 +70,21 @@ _options() {
         ':pair:_pairs'
       ;;
 
-    (erase|shutdown)
+    (erase)
       _arguments \
-        '*: :{_devices_all; _devices}'
+        '*: :{_devices_all; FILTER=available_shutdown _devices}'
       ;;
 
     (boot)
       _arguments \
-        ': :{_devices; _pairs}' \
+        ': :{FILTER=available_shutdown _devices; _pairs}' \
         '--disabledJob=-[Disables the given launchd job.]' \
         '--enabledJob=-[Enables the given launchd job when it would normally be disabled.]'
+      ;;
+
+    (shutdown)
+      _arguments \
+        '*: :{_devices_all; FILTER=booted _devices}'
       ;;
 
     (rename)
@@ -136,8 +141,12 @@ _devices() {
       | .devices[][] |= (.devicetype = $devicetypes[.deviceTypeIdentifier])
       | [.devices[][]] | sort_by(.logPathSize) | reverse[]
       | select(
-        if $ENV.FILTER == "available" then
-          .isAvailable
+        if $ENV.FILTER == "available_shutdown" then
+          .isAvailable and .state == "Shutdown"
+        elif $ENV.FILTER == "shutdown" then
+          .state == "Shutdown"
+        elif $ENV.FILTER == "booted" then
+          .state == "Booted"
         elif $ENV.FILTER == "watches" then
           .devicetype.productFamily == "Apple Watch"
         elif $ENV.FILTER == "phones" then
@@ -146,7 +155,7 @@ _devices() {
           true
         end
       )
-      | "\(.udid):\(.name) (\(.devicetype.name // "unknown type"), \(.runtime.name // .availabilityError))"
+      | "\(.udid):\(.name) (\(.devicetype.name // "unknown type"), \(.runtime.name // .availabilityError)) (\(.state))"
     ')"})
   _describe -V device devices
 }
