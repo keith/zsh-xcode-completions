@@ -110,3 +110,7 @@ Shutdown a device.
 Usage: simctl shutdown <device> | all
 
 Specifying all will shut down all running devices
+
+xcrun simctl help rename
+Rename a device.
+Usage: simctl rename <device> <name>

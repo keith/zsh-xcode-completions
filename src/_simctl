@@ -22,6 +22,7 @@ _commands() {
     'erase:Erase a device'"'"'s contents and settings.'
     'boot:Boot a device or device pair.'
     'shutdown:Shutdown a device.'
+    'rename:Rename a device.'
   )
   _describe subcommand commands
 }
@@ -79,6 +80,12 @@ _options() {
         ': :{_devices; _pairs}' \
         '--disabledJob=-[Disables the given launchd job.]' \
         '--enabledJob=-[Enables the given launchd job when it would normally be disabled.]'
+      ;;
+
+    (rename)
+      _arguments \
+        ':device:_devices' \
+        ':name:'
       ;;
 
   esac

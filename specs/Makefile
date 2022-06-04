@@ -29,3 +29,5 @@ simctl:
 	-xcrun simctl help boot
 	@echo
 	-xcrun simctl help shutdown
+	@echo
+	-xcrun simctl help rename
