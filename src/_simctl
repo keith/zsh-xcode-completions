@@ -34,7 +34,7 @@ _options() {
 
     (clone)
       _arguments \
-        ':device:_devices' \
+        ':device:{FILTER=available _devices}' \
         ':name:' \
         '::destination device set:_files -/'
       ;;
@@ -70,11 +70,18 @@ _runtimes() {
 
 _devices() {
   local -a devices
-  devices=(${(f)"$(xcrun simctl list -j | jq -r '
+  devices=(${(f)"$(xcrun simctl list -j | jq -r --arg filter "$FILTER" '
     (.devicetypes | INDEX(.identifier)) as $devicetypes
     | (.runtimes | INDEX(.identifier)) as $runtimes
     | .devices |= with_entries(.value[].runtime = .key)
     | [.devices[][]] | sort_by(.logPathSize) | reverse[]
+    | select(
+      if $filter == "available" then
+        .isAvailable
+      else
+        true
+      end
+    )
     | "\(.udid):\(.name) (\($devicetypes[.deviceTypeIdentifier].name // "unknown type"), \($runtimes[.runtime].name // .availabilityError))"
     ')"})
   _describe -V device devices
