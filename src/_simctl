@@ -16,6 +16,7 @@ _commands() {
     'clone:Clone an existing device.'
     'upgrade:Upgrade a device to a newer runtime.'
     'delete:Delete specified devices, unavailable devices, or all devices.'
+    'pair:Create a new watch and phone pair.'
   )
   _describe subcommand commands
 }
@@ -50,6 +51,12 @@ _options() {
     (delete)
       _arguments \
         '*: :{_special_devices; _devices}'
+      ;;
+
+    (pair)
+      _arguments \
+        ':device:{FILTER=watches _devices}' \
+        ':device:{FILTER=phones _devices}'
       ;;
 
   esac
@@ -96,18 +103,23 @@ _runtimes() {
 _devices() {
   local -a devices
   devices=(${(f)"$(xcrun simctl list -j | jq -r --arg filter "$FILTER" '
-    (.devicetypes | INDEX(.identifier)) as $devicetypes
-    | (.runtimes | INDEX(.identifier)) as $runtimes
-    | .devices |= with_entries(.value[].runtime = .key)
-    | [.devices[][]] | sort_by(.logPathSize) | reverse[]
-    | select(
-      if $filter == "available" then
-        .isAvailable
-      else
-        true
-      end
-    )
-    | "\(.udid):\(.name) (\($devicetypes[.deviceTypeIdentifier].name // "unknown type"), \($runtimes[.runtime].name // .availabilityError))"
+      (.devicetypes | INDEX(.identifier)) as $devicetypes
+      | (.runtimes | INDEX(.identifier)) as $runtimes
+      | .devices |= with_entries(.value[].runtime = $runtimes[.key])
+      | .devices[][] |= (.devicetype = $devicetypes[.deviceTypeIdentifier])
+      | [.devices[][]] | sort_by(.logPathSize) | reverse[]
+      | select(
+        if $ARGS.named.filter == "available" then
+          .isAvailable
+        elif $ARGS.named.filter == "watches" then
+          .devicetype.productFamily == "Apple Watch"
+        elif $ARGS.named.filter == "phones" then
+          .devicetype.productFamily == "iPhone"
+        else
+          true
+        end
+      )
+      | "\(.udid):\(.name) (\(.devicetype.name // "unknown type"), \(.runtime.name // .availabilityError))"
     ')"})
   _describe -V device devices
 }

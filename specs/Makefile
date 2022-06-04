@@ -17,3 +17,5 @@ simctl:
 	-xcrun simctl help upgrade
 	@echo
 	-xcrun simctl help delete
+	@echo
+	-xcrun simctl help pair

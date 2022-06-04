@@ -75,3 +75,7 @@ Usage: simctl delete <device> [... <device n>] | unavailable | all
 
 Specifying unavailable will delete devices that are not supported by the current Xcode SDK.
 
+
+xcrun simctl help pair
+Create a new watch and phone pair.
+Usage: simctl pair <watch device> <phone device>
