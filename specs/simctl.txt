@@ -87,3 +87,9 @@ Usage: simctl unpair <pair UUID>
 xcrun simctl help pair_activate
 Set a given pair as active.
 Usage: simctl pair_activate <pair>
+
+xcrun simctl help erase
+Erase a device's contents and settings.
+Usage: simctl erase <device> [... <device n>] | all
+
+Specifying all will erase all existing devices.

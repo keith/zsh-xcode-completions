@@ -23,3 +23,5 @@ simctl:
 	-xcrun simctl help unpair
 	@echo
 	-xcrun simctl help pair_activate
+	@echo
+	-xcrun simctl help erase

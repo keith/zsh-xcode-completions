@@ -19,6 +19,7 @@ _commands() {
     'pair:Create a new watch and phone pair.'
     'unpair:Unpair a watch and phone pair.'
     'pair_activate:Unpair a watch and phone pair.'
+    'erase:Erase a device'"'"'s contents and settings.'
   )
   _describe subcommand commands
 }
@@ -52,7 +53,7 @@ _options() {
 
     (delete)
       _arguments \
-        '*: :{_special_devices; _devices}'
+        '*: :{_devices_unavailable; _devices_all; _devices}'
       ;;
 
     (pair)
@@ -66,6 +67,10 @@ _options() {
         ':pair:_pairs'
       ;;
 
+    (erase)
+      _arguments \
+        '*: :{_devices_all; _devices}'
+      ;;
 
   esac
 }
@@ -132,13 +137,20 @@ _devices() {
   _describe -V device devices
 }
 
-_special_devices() {
-  local -a special
-  special=(
-    unavailable:'Devices not supported by the current Xcode SDK'
+_devices_all() {
+  local -a devices
+  devices=(
     all:'All devices'
   )
-  _describe -V special special
+  _describe -V special devices
+}
+
+_devices_unavailable() {
+  local -a devices
+  devices=(
+    unavailable:'Devices not supported by the current Xcode SDK'
+  )
+  _describe -V special devices
 }
 
 _pairs() {
