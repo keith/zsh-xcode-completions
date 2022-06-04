@@ -21,6 +21,7 @@ _commands() {
     'pair_activate:Unpair a watch and phone pair.'
     'erase:Erase a device'"'"'s contents and settings.'
     'boot:Boot a device or device pair.'
+    'shutdown:Shutdown a device.'
   )
   _describe subcommand commands
 }
@@ -68,7 +69,7 @@ _options() {
         ':pair:_pairs'
       ;;
 
-    (erase)
+    (erase|shutdown)
       _arguments \
         '*: :{_devices_all; _devices}'
       ;;

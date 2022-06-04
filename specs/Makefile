@@ -27,3 +27,5 @@ simctl:
 	-xcrun simctl help erase
 	@echo
 	-xcrun simctl help boot
+	@echo
+	-xcrun simctl help shutdown

@@ -104,3 +104,9 @@ Usage: simctl boot <device> [--disabledJob=<job>] [--enabledJob=<job>]
 
 
 If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
+
+xcrun simctl help shutdown
+Shutdown a device.
+Usage: simctl shutdown <device> | all
+
+Specifying all will shut down all running devices
