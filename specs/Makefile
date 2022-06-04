@@ -11,3 +11,5 @@ simctl:
 	-xcrun simctl help help
 	@echo
 	-xcrun simctl help create
+	@echo
+	-xcrun simctl help clone

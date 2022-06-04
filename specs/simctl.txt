@@ -60,3 +60,7 @@ Usage: simctl create <name> <device type id> [<runtime id>]
 	                    Examples: ("watchOS3", "watchOS3.2", "watchOS 3.2", "com.apple.CoreSimulator.SimRuntime.watchOS-3-2",
 	                               "/Volumes/path/to/Runtimes/watchOS 3.2.simruntime")
 
+
+xcrun simctl help clone
+Clone an existing device.
+Usage: simctl clone <device> <new name> [<destination device set>]

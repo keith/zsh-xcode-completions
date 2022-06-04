@@ -13,6 +13,7 @@ _commands() {
   commands=(
     'help:Prints the usage for a given subcommand.'
     'create:Create a new device.'
+    'clone:Clone an existing device.'
   )
   _describe subcommand commands
 }
@@ -29,6 +30,13 @@ _options() {
         ':name:' \
         ':device type id:_devicetypes' \
         '::runtime id:{DEVICETYPE=${(Q)words[3]} _runtimes}'
+      ;;
+
+    (clone)
+      _arguments \
+        ':device:_devices' \
+        ':name:' \
+        '::destination device set:_files -/'
       ;;
 
   esac
@@ -58,4 +66,16 @@ _runtimes() {
     '
     )"})
   _describe -V runtime runtimes
+}
+
+_devices() {
+  local -a devices
+  devices=(${(f)"$(xcrun simctl list -j | jq -r '
+    (.devicetypes | INDEX(.identifier)) as $devicetypes
+    | (.runtimes | INDEX(.identifier)) as $runtimes
+    | .devices |= with_entries(.value[].runtime = .key)
+    | [.devices[][]] | sort_by(.logPathSize) | reverse[]
+    | "\(.udid):\(.name) (\($devicetypes[.deviceTypeIdentifier].name // "unknown type"), \($runtimes[.runtime].name // .availabilityError))"
+    ')"})
+  _describe -V device devices
 }
