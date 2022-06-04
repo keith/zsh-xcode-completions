@@ -25,7 +25,10 @@ _options() {
       ;;
 
     (create)
-      _arguments ':name:' ':device type id:_devicetypes' '::runtime id:_runtimes'
+      _arguments \
+        ':name:' \
+        ':device type id:_devicetypes' \
+        '::runtime id:{DEVICETYPE=${(Q)words[3]} _runtimes}'
       ;;
 
   esac
@@ -39,6 +42,11 @@ _devicetypes() {
 
 _runtimes() {
   local -a runtimes
-  runtimes=(${(f)"$(xcrun simctl list runtimes --json | jq -r '.runtimes[].identifier')"})
+  runtimes=(${(f)"$(
+    jq -nr \
+      --argfile devicetypes <(xcrun simctl list devicetypes "${DEVICETYPE:-.}" -j) \
+      --argfile runtimes <(xcrun simctl list runtimes -j) \
+      '$runtimes.runtimes[] | select(any(.supportedDeviceTypes[].identifier == $devicetypes.devicetypes[].identifier; .)).identifier'
+    )"})
   _describe runtime runtimes
 }
