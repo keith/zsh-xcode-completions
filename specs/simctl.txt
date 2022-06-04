@@ -68,3 +68,10 @@ Usage: simctl clone <device> <new name> [<destination device set>]
 xcrun simctl help upgrade
 Upgrade a device to a newer runtime.
 Usage: simctl upgrade <device> <runtime id>
+
+xcrun simctl help delete
+Delete specified devices, unavailable devices, or all devices.
+Usage: simctl delete <device> [... <device n>] | unavailable | all
+
+Specifying unavailable will delete devices that are not supported by the current Xcode SDK.
+

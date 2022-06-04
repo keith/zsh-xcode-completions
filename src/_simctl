@@ -15,6 +15,7 @@ _commands() {
     'create:Create a new device.'
     'clone:Clone an existing device.'
     'upgrade:Upgrade a device to a newer runtime.'
+    'delete:Delete specified devices, unavailable devices, or all devices.'
   )
   _describe subcommand commands
 }
@@ -44,6 +45,11 @@ _options() {
       _arguments \
         ':device:_devices' \
         ':runtime id:{DEVICE=${(Q)words[2]} _runtimes}'
+      ;;
+
+    (delete)
+      _arguments \
+        '*: :{_special_devices; _devices}'
       ;;
 
   esac
@@ -104,4 +110,13 @@ _devices() {
     | "\(.udid):\(.name) (\($devicetypes[.deviceTypeIdentifier].name // "unknown type"), \($runtimes[.runtime].name // .availabilityError))"
     ')"})
   _describe -V device devices
+}
+
+_special_devices() {
+  local -a special
+  special=(
+    unavailable:'Devices not supported by the current Xcode SDK'
+    all:'All devices'
+  )
+  _describe -V special special
 }
