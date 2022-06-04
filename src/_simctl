@@ -14,6 +14,7 @@ _commands() {
     'help:Prints the usage for a given subcommand.'
     'create:Create a new device.'
     'clone:Clone an existing device.'
+    'upgrade:Upgrade a device to a newer runtime.'
   )
   _describe subcommand commands
 }
@@ -39,6 +40,12 @@ _options() {
         '::destination device set:_files -/'
       ;;
 
+    (upgrade)
+      _arguments \
+        ':device:_devices' \
+        ':runtime id:{DEVICE=${(Q)words[2]} _runtimes}'
+      ;;
+
   esac
 }
 
@@ -51,7 +58,19 @@ _devicetypes() {
 _runtimes() {
   local -a runtimes
   runtimes=(${(f)"$(
-    xcrun simctl list -j | jq -r --arg devicetype "$DEVICETYPE" '
+    xcrun simctl list -j | jq -r \
+      --arg devicetype "$DEVICETYPE" \
+      --arg device "$DEVICE" \
+      '
+      (
+        if $devicetype | length > 0 then
+          $devicetype
+        elif $device | length > 0 then
+          first(.devices[][] | select(.udid == $device)).deviceTypeIdentifier // ""
+        else
+          ""
+        end
+      ) as $devicetype |
       (
         .devicetypes | map(select(
           ((.identifier | ascii_downcase) | contains($devicetype | ascii_downcase))

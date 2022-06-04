@@ -13,3 +13,5 @@ simctl:
 	-xcrun simctl help create
 	@echo
 	-xcrun simctl help clone
+	@echo
+	-xcrun simctl help upgrade

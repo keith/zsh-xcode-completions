@@ -64,3 +64,7 @@ Usage: simctl create <name> <device type id> [<runtime id>]
 xcrun simctl help clone
 Clone an existing device.
 Usage: simctl clone <device> <new name> [<destination device set>]
+
+xcrun simctl help upgrade
+Upgrade a device to a newer runtime.
+Usage: simctl upgrade <device> <runtime id>
