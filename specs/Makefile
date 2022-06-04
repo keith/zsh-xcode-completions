@@ -35,3 +35,5 @@ simctl:
 	-xcrun simctl help getenv
 	@echo
 	-xcrun simctl help openurl
+	@echo
+	-xcrun simctl help addmedia

@@ -122,3 +122,13 @@ Usage: simctl getenv <device> <variable name>
 xcrun simctl help openurl
 Open a URL in a device.
 Usage: simctl openurl <device> <URL>
+
+xcrun simctl help addmedia
+Add photos, live photos, videos, or contacts to the library of a device.
+Usage: simctl addmedia <device> <path> [... <path>]
+
+You can specify multiple files including a mix of photos, videos, and contacts.
+
+You can also specify multiple live photos by providing the photo and video files. They will automatically be discovered and imported correctly.
+
+Contacts support the vCard format.

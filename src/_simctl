@@ -25,6 +25,7 @@ _commands() {
     'rename:Rename a device.'
     'getenv:Print an environment variable from a running device.'
     'openurl:Open a URL in a device.'
+    'addmedia:Add photos, live photos, videos, or contacts to the library of a device.'
   )
   _describe subcommand commands
 }
@@ -105,6 +106,12 @@ _options() {
       _arguments \
         ':device:{FILTER=booted _devices}' \
         ':url:{DEVICE=${(Q)words[2]} _urls}'
+      ;;
+
+    (addmedia)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        '*:path:_files'
       ;;
 
   esac
