@@ -93,3 +93,14 @@ Erase a device's contents and settings.
 Usage: simctl erase <device> [... <device n>] | all
 
 Specifying all will erase all existing devices.
+
+xcrun simctl help boot
+Boot a device or device pair.
+Usage: simctl boot <device> [--disabledJob=<job>] [--enabledJob=<job>]
+
+	--disabledJob=<job>     Disables the given launchd job. Multiple jobs can be disabled by passing multiple flags.
+	--enabledJob=<job>      Enables the given launchd job when it would normally be disabled.
+	                        Multiple jobs can be enabled by passing multiple flags.
+
+
+If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.

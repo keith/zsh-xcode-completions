@@ -20,6 +20,7 @@ _commands() {
     'unpair:Unpair a watch and phone pair.'
     'pair_activate:Unpair a watch and phone pair.'
     'erase:Erase a device'"'"'s contents and settings.'
+    'boot:Boot a device or device pair.'
   )
   _describe subcommand commands
 }
@@ -70,6 +71,13 @@ _options() {
     (erase)
       _arguments \
         '*: :{_devices_all; _devices}'
+      ;;
+
+    (boot)
+      _arguments \
+        ': :{_devices; _pairs}' \
+        '--disabledJob=-[Disables the given launchd job.]' \
+        '--enabledJob=-[Enables the given launchd job when it would normally be disabled.]'
       ;;
 
   esac
