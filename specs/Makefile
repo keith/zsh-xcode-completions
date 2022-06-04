@@ -33,3 +33,5 @@ simctl:
 	-xcrun simctl help rename
 	@echo
 	-xcrun simctl help getenv
+	@echo
+	-xcrun simctl help openurl

@@ -24,6 +24,7 @@ _commands() {
     'shutdown:Shutdown a device.'
     'rename:Rename a device.'
     'getenv:Print an environment variable from a running device.'
+    'openurl:Open a URL in a device.'
   )
   _describe subcommand commands
 }
@@ -98,6 +99,12 @@ _options() {
       _arguments \
         ':device:{FILTER=booted _devices}' \
         ':variable name:'
+      ;;
+
+    (openurl)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        ':url:{DEVICE=${(Q)words[2]} _urls}'
       ;;
 
   esac
@@ -190,4 +197,18 @@ _pairs() {
     "\(.key):\(.value.watch.name) - \(.value.phone.name) \(.value.state)"
   ')"})
   _describe pair pairs
+}
+
+_urls() {
+  local -a urls
+  urls=(${(f)"$(
+    xcrun simctl listapps "$DEVICE" |
+      plutil -convert json - -o - |
+      jq -r '.[] | select(.ApplicationType == "User") | .Path' |
+      while read app; do
+        plutil -convert json "$app"/Info.plist -o - | jq -r '.CFBundleURLTypes[]?.CFBundleURLSchemes[]? + "\\://"';
+      done
+    )"})
+  urls+=('http\://' 'https\://')
+  _describe url urls
 }

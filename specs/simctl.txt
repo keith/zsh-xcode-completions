@@ -118,3 +118,7 @@ Usage: simctl rename <device> <name>
 xcrun simctl help getenv
 Print an environment variable from a running device.
 Usage: simctl getenv <device> <variable name>
+
+xcrun simctl help openurl
+Open a URL in a device.
+Usage: simctl openurl <device> <URL>
