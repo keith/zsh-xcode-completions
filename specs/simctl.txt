@@ -83,3 +83,7 @@ Usage: simctl pair <watch device> <phone device>
 xcrun simctl help unpair
 Unpair a watch and phone pair.
 Usage: simctl unpair <pair UUID>
+
+xcrun simctl help pair_activate
+Set a given pair as active.
+Usage: simctl pair_activate <pair>

@@ -18,6 +18,7 @@ _commands() {
     'delete:Delete specified devices, unavailable devices, or all devices.'
     'pair:Create a new watch and phone pair.'
     'unpair:Unpair a watch and phone pair.'
+    'pair_activate:Unpair a watch and phone pair.'
   )
   _describe subcommand commands
 }
@@ -60,7 +61,7 @@ _options() {
         ':device:{FILTER=phones _devices}'
       ;;
 
-    (unpair)
+    (unpair|pair_activate)
       _arguments \
         ':pair:_pairs'
       ;;
