@@ -85,14 +85,12 @@ _runtimes() {
   local -a runtimes
   runtimes=(${(f)"$(
     xcrun simctl list -j | jq -r \
-      --arg devicetype "$DEVICETYPE" \
-      --arg device "$DEVICE" \
       '
       (
-        if $devicetype | length > 0 then
-          $devicetype
-        elif $device | length > 0 then
-          first(.devices[][] | select(.udid == $device)).deviceTypeIdentifier // ""
+        if $ENV.DEVICETYPE | length > 0 then
+          $ENV.DEVICETYPE
+        elif $ENV.DEVICE | length > 0 then
+          first(.devices[][] | select(.udid == $ENV.DEVICE)).deviceTypeIdentifier // ""
         else
           ""
         end
@@ -115,18 +113,18 @@ _runtimes() {
 
 _devices() {
   local -a devices
-  devices=(${(f)"$(xcrun simctl list -j | jq -r --arg filter "$FILTER" '
+  devices=(${(f)"$(xcrun simctl list -j | jq -r '
       (.devicetypes | INDEX(.identifier)) as $devicetypes
       | (.runtimes | INDEX(.identifier)) as $runtimes
       | .devices |= with_entries(.value[].runtime = $runtimes[.key])
       | .devices[][] |= (.devicetype = $devicetypes[.deviceTypeIdentifier])
       | [.devices[][]] | sort_by(.logPathSize) | reverse[]
       | select(
-        if $ARGS.named.filter == "available" then
+        if $ENV.FILTER == "available" then
           .isAvailable
-        elif $ARGS.named.filter == "watches" then
+        elif $ENV.FILTER == "watches" then
           .devicetype.productFamily == "Apple Watch"
-        elif $ARGS.named.filter == "phones" then
+        elif $ENV.FILTER == "phones" then
           .devicetype.productFamily == "iPhone"
         else
           true
