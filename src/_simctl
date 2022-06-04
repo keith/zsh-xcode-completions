@@ -23,6 +23,7 @@ _commands() {
     'boot:Boot a device or device pair.'
     'shutdown:Shutdown a device.'
     'rename:Rename a device.'
+    'getenv:Print an environment variable from a running device.'
   )
   _describe subcommand commands
 }
@@ -91,6 +92,12 @@ _options() {
       _arguments \
         ':device:_devices' \
         ':name:'
+      ;;
+
+    (getenv)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        ':variable name:'
       ;;
 
   esac

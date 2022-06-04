@@ -31,3 +31,5 @@ simctl:
 	-xcrun simctl help shutdown
 	@echo
 	-xcrun simctl help rename
+	@echo
+	-xcrun simctl help getenv

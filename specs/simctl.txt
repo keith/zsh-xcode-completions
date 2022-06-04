@@ -114,3 +114,7 @@ Specifying all will shut down all running devices
 xcrun simctl help rename
 Rename a device.
 Usage: simctl rename <device> <name>
+
+xcrun simctl help getenv
+Print an environment variable from a running device.
+Usage: simctl getenv <device> <variable name>
