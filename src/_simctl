@@ -43,10 +43,19 @@ _devicetypes() {
 _runtimes() {
   local -a runtimes
   runtimes=(${(f)"$(
-    jq -nr \
-      --argfile devicetypes <(xcrun simctl list devicetypes "${DEVICETYPE:-.}" -j) \
-      --argfile runtimes <(xcrun simctl list runtimes -j) \
-      '$runtimes.runtimes[] | select(any(.supportedDeviceTypes[].identifier == $devicetypes.devicetypes[].identifier; .)).identifier'
+    xcrun simctl list -j | jq -r --arg devicetype "$DEVICETYPE" '
+      (
+        .devicetypes | map(select(
+          ((.identifier | ascii_downcase) | contains($devicetype | ascii_downcase))
+          or ((.name | ascii_downcase) | contains($devicetype | ascii_downcase))
+        )) | INDEX(.identifier)
+      ) as $devicetypes
+      | .runtimes |= (sort_by([{iOS:"x"}[.platform] // .platform, .buildversion]) | reverse)
+      | .runtimes[]
+      | select(.isAvailable)
+      | select(any($devicetypes[.supportedDeviceTypes[].identifier]; .))
+      | "\(.identifier):\(.name) (\(.version) - \(.buildversion))"
+    '
     )"})
-  _describe runtime runtimes
+  _describe -V runtime runtimes
 }
