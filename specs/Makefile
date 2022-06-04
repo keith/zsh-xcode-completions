@@ -19,3 +19,5 @@ simctl:
 	-xcrun simctl help delete
 	@echo
 	-xcrun simctl help pair
+	@echo
+	-xcrun simctl help unpair

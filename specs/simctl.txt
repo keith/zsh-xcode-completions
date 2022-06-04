@@ -79,3 +79,7 @@ Specifying unavailable will delete devices that are not supported by the current
 xcrun simctl help pair
 Create a new watch and phone pair.
 Usage: simctl pair <watch device> <phone device>
+
+xcrun simctl help unpair
+Unpair a watch and phone pair.
+Usage: simctl unpair <pair UUID>

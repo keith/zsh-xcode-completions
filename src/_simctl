@@ -17,6 +17,7 @@ _commands() {
     'upgrade:Upgrade a device to a newer runtime.'
     'delete:Delete specified devices, unavailable devices, or all devices.'
     'pair:Create a new watch and phone pair.'
+    'unpair:Unpair a watch and phone pair.'
   )
   _describe subcommand commands
 }
@@ -58,6 +59,12 @@ _options() {
         ':device:{FILTER=watches _devices}' \
         ':device:{FILTER=phones _devices}'
       ;;
+
+    (unpair)
+      _arguments \
+        ':pair:_pairs'
+      ;;
+
 
   esac
 }
@@ -131,4 +138,13 @@ _special_devices() {
     all:'All devices'
   )
   _describe -V special special
+}
+
+_pairs() {
+  local -a pairs
+  pairs=(${(f)"$(xcrun simctl list pairs -j | jq -r '
+    .pairs | to_entries[] |
+    "\(.key):\(.value.watch.name) - \(.value.phone.name) \(.value.state)"
+  ')"})
+  _describe pair pairs
 }
