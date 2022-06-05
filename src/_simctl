@@ -247,9 +247,9 @@ _urls() {
   local -a urls
   urls+=('http\://' 'https\://')
   urls+=(${(f)"$(
-    xcrun simctl listapps "$DEVICE" |
+    xcrun simctl listapps "$DEVICE" 2>/dev/null |
       plutil -convert json - -o - |
-      jq -r '[.[]] | sort_by(.ApplicationType) | reverse[].Path' |
+      jq -r 2>/dev/null '[.[]] | sort_by(.ApplicationType) | reverse[].Path' |
       while read app; do plutil -convert json "$app"/Info.plist -o -; done |
       jq -r '[.CFBundleURLTypes[]?.CFBundleURLSchemes[]?] - ["http", "https"] | .[] + "\\:"'
   )"})
@@ -259,9 +259,9 @@ _urls() {
 _bundle_identifiers() {
   local -a identifiers
   identifiers=(${(f)"$(
-    xcrun simctl listapps "$DEVICE" |
+    xcrun simctl listapps "$DEVICE" 2>/dev/null |
       plutil -convert json - -o - |
-      jq -r '
+      jq -r 2>/dev/null '
         [.[]] | sort_by(.ApplicationType) | reverse[]
         | select(.ApplicationType == ($ENV.APPLICATION_TYPE // .ApplicationType))
         | "\(.CFBundleIdentifier):\(.CFBundleDisplayName)"
@@ -275,9 +275,9 @@ _containers() {
   local -a containers
   containers+=(app data groups)
   containers+=(${(f)"$(
-    xcrun simctl listapps "$DEVICE" |
+    xcrun simctl listapps "$DEVICE" 2>/dev/null |
       plutil -convert json - -o - |
-      jq -r '.[] | select(.CFBundleIdentifier == $ENV.BUNDLE_IDENTIFIER) | .GroupContainers | keys[]'
+      jq -r 2>/dev/null '.[] | select(.CFBundleIdentifier == $ENV.BUNDLE_IDENTIFIER) | .GroupContainers | keys[]'
     )"})
   _describe -V container containers
 }
