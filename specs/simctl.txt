@@ -189,3 +189,12 @@ The path to the executable is searched using the following rules:
    <path> contains non-leading / characters: search relative to the current directory first, then relative to the device's $SIMULATOR_ROOT.
 
 If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
+
+xcrun simctl help list
+List available devices, device types, runtimes, or device pairs.
+Usage: simctl list [-j | --json] [-v] [devices|devicetypes|runtimes|pairs] [<search term>|available]
+-j     Print as JSON
+-v     More verbose output
+
+Specify one of 'devices', 'devicetypes', 'runtimes', or 'pairs' to list only items of that type. If a type filter is specified you may also specify a search term. Search terms use a simple case-insensitive contains check against the item's description. You may use the search term 'available' to only list available items.
+

@@ -51,3 +51,5 @@ simctl:
 	-xcrun simctl help terminate
 	@echo
 	-xcrun simctl help spawn
+	@echo
+	-xcrun simctl help list

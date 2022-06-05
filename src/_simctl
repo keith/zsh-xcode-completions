@@ -33,6 +33,7 @@ _commands() {
     'launch:Launch an application by identifier on a device.'
     'terminate:Terminate an application by identifier on a device.'
     'spawn:Spawn a process by executing a given executable on a device.'
+    'list:List available devices, device types, runtimes, or device pairs.'
   )
   _describe subcommand commands
 }
@@ -174,6 +175,14 @@ _options() {
         '(-):device:{FILTER=booted _devices}' \
         ':path:_files' \
         '*::argv:'
+      ;;
+
+    (list)
+      _arguments \
+        '(-j --json)'{-j,--json}'[Print as JSON.]' \
+        '-v[More verbose output]' \
+        ':list:(devices devicetypes runtimes pairs)' \
+        '::search term:(available)'
       ;;
 
   esac
