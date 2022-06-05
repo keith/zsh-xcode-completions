@@ -35,6 +35,7 @@ _commands() {
     'spawn:Spawn a process by executing a given executable on a device.'
     'list:List available devices, device types, runtimes, or device pairs.'
     'icloud_sync:Trigger iCloud sync on a device.'
+    'pbsync:Sync the pasteboard content from one pasteboard to another.'
   )
   _describe subcommand commands
 }
@@ -191,6 +192,14 @@ _options() {
         ':device:{FILTER=booted _devices}'
       ;;
 
+    (pbsync)
+      _arguments \
+        '-p[causes simctl to use promise data for secondary types]' \
+        '-v' \
+        ':source device:{_host; FILTER=booted _devices}' \
+        ':destination device:{_host; FILTER=booted _devices}'
+      ;;
+
   esac
 }
 
@@ -307,4 +316,12 @@ _containers() {
       jq -r 2>/dev/null '.[] | select(.CFBundleIdentifier == $ENV.BUNDLE_IDENTIFIER) | .GroupContainers | keys[]'
     )"})
   _describe -V container containers
+}
+
+_host() {
+  local -a host
+  host=(
+    host
+  )
+  _describe -V device host
 }

@@ -202,3 +202,9 @@ Specify one of 'devices', 'devicetypes', 'runtimes', or 'pairs' to list only ite
 xcrun simctl help icloud_sync
 Trigger iCloud sync on a device.
 Usage: simctl icloud_sync <device>
+
+xcrun simctl help pbsync
+Sync the pasteboard content from one pasteboard to another.
+Usage: simctl pbsync [-pv] <source device or "host"> <destination device or "host">
+
+ -p causes simctl to use promise data for secondary types.  simctl will continue to run to provide that promise data until something else replaces it on the pasteboard.
