@@ -39,3 +39,5 @@ simctl:
 	-xcrun simctl help addmedia
 	@echo
 	-xcrun simctl help install
+	@echo
+	-xcrun simctl help uninstall

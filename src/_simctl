@@ -27,6 +27,7 @@ _commands() {
     'openurl:Open a URL in a device.'
     'addmedia:Add photos, live photos, videos, or contacts to the library of a device.'
     'install:Install an app on a device.'
+    'uninstall:Uninstall an app from a device.'
   )
   _describe subcommand commands
 }
@@ -119,6 +120,12 @@ _options() {
       _arguments \
         ':device:{FILTER=booted _devices}' \
         ':path:_files -/'
+      ;;
+
+    (uninstall)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}'
       ;;
 
   esac
@@ -225,4 +232,14 @@ _urls() {
     )"})
   urls+=('http\://' 'https\://')
   _describe url urls
+}
+
+_bundle_identifiers() {
+  local -a identifiers
+  identifiers=(${(f)"$(
+    xcrun simctl listapps "$DEVICE" |
+      plutil -convert json - -o - |
+      jq -r '.[] | select(.ApplicationType == "User") | .CFBundleIdentifier'
+    )"})
+  _describe 'bundle identifier' identifiers
 }

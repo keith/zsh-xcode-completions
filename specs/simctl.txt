@@ -136,3 +136,7 @@ Contacts support the vCard format.
 xcrun simctl help install
 Install an app on a device.
 Usage: simctl install <device> <path>
+
+xcrun simctl help uninstall
+Uninstall an app from a device.
+Usage: simctl uninstall <device> <app bundle identifier>
