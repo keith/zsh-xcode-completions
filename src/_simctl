@@ -168,53 +168,50 @@ _devicetypes() {
 
 _runtimes() {
   local -a runtimes
-  runtimes=(${(f)"$(
-    xcrun simctl list -j | jq -r \
-      '
-      (
-        if $ENV.DEVICETYPE | length > 0 then
-          $ENV.DEVICETYPE
-        elif $ENV.DEVICE | length > 0 then
-          first(.devices[][] | select(.udid == $ENV.DEVICE)).deviceTypeIdentifier // ""
-        else
-          ""
-        end
-      ) as $devicetype |
-      (
-        .devicetypes | map(select(
-          ((.identifier | ascii_downcase) | contains($devicetype | ascii_downcase))
-          or ((.name | ascii_downcase) | contains($devicetype | ascii_downcase))
-        )) | INDEX(.identifier)
-      ) as $devicetypes
-      | .runtimes |= (sort_by([{iOS:"x"}[.platform] // .platform, .buildversion]) | reverse)
-      | .runtimes[]
-      | select(.isAvailable)
-      | select(any($devicetypes[.supportedDeviceTypes[].identifier]; .))
-      | "\(.identifier):\(.name) (\(.version) - \(.buildversion))"
-    '
-    )"})
+  runtimes=(${(f)"$(xcrun simctl list -j | jq -r '
+    (
+      if $ENV.DEVICETYPE | length > 0 then
+        $ENV.DEVICETYPE
+      elif $ENV.DEVICE | length > 0 then
+        first(.devices[][] | select(.udid == $ENV.DEVICE)).deviceTypeIdentifier // ""
+      else
+        ""
+      end
+    ) as $devicetype |
+    (
+      .devicetypes | map(select(
+        ((.identifier | ascii_downcase) | contains($devicetype | ascii_downcase))
+        or ((.name | ascii_downcase) | contains($devicetype | ascii_downcase))
+      )) | INDEX(.identifier)
+    ) as $devicetypes
+    | .runtimes |= (sort_by([{iOS:"x"}[.platform] // .platform, .buildversion]) | reverse)
+    | .runtimes[]
+    | select(.isAvailable)
+    | select(any($devicetypes[.supportedDeviceTypes[].identifier]; .))
+    | "\(.identifier):\(.name) (\(.version) - \(.buildversion))"
+  ')"})
   _describe -V runtime runtimes
 }
 
 _devices() {
   local -a devices
   devices=(${(f)"$(xcrun simctl list -j | jq -r '
-      (.devicetypes | INDEX(.identifier)) as $devicetypes
-      | (.runtimes | INDEX(.identifier)) as $runtimes
-      | .devices |= with_entries(.value[].runtime = $runtimes[.key])
-      | .devices[][] |= (.devicetype = $devicetypes[.deviceTypeIdentifier])
-      | [.devices[][]] | sort_by(.logPathSize) | reverse[]
-      | select(contains(
-        {
-          available_shutdown: {isAvailable: true, state: "Shutdown"},
-          shutdown: {state: "Shutdown"},
-          booted: {state: "Booted"},
-          watches: {devicetype: {productFamily: "Apple Watch"}},
-          phones: {devicetype: {productFamily: "iPhone"}},
-        }[$ENV.FILTER // "none"] // {}
-      ))
-      | "\(.udid):\(.name) (\(.devicetype.name // "unknown type"), \(.runtime.name // .availabilityError)) (\(.state))"
-    ')"})
+    (.devicetypes | INDEX(.identifier)) as $devicetypes
+    | (.runtimes | INDEX(.identifier)) as $runtimes
+    | .devices |= with_entries(.value[].runtime = $runtimes[.key])
+    | .devices[][] |= (.devicetype = $devicetypes[.deviceTypeIdentifier])
+    | [.devices[][]] | sort_by(.logPathSize) | reverse[]
+    | select(contains(
+      {
+        available_shutdown: {isAvailable: true, state: "Shutdown"},
+        shutdown: {state: "Shutdown"},
+        booted: {state: "Booted"},
+        watches: {devicetype: {productFamily: "Apple Watch"}},
+        phones: {devicetype: {productFamily: "iPhone"}},
+      }[$ENV.FILTER // "none"] // {}
+    ))
+    | "\(.udid):\(.name) (\(.devicetype.name // "unknown type"), \(.runtime.name // .availabilityError)) (\(.state))"
+  ')"})
   _describe -V device devices
 }
 
@@ -252,7 +249,7 @@ _urls() {
       jq -r '[.[]] | sort_by(.ApplicationType) | reverse[].Path' |
       while read app; do plutil -convert json "$app"/Info.plist -o -; done |
       jq -r '[.CFBundleURLTypes[]?.CFBundleURLSchemes[]?] - ["http", "https"] | .[] + "\\:"'
-    )"})
+  )"})
   _describe -V url urls
 }
 
@@ -261,8 +258,13 @@ _bundle_identifiers() {
   identifiers=(${(f)"$(
     xcrun simctl listapps "$DEVICE" |
       plutil -convert json - -o - |
-      jq -r '[.[]] | sort_by(.ApplicationType) | reverse[] | select(.ApplicationType == ($ENV.APPLICATION_TYPE // .ApplicationType)) | .CFBundleIdentifier'
-    )"})
+      jq -r '
+        [.[]] | sort_by(.ApplicationType) | reverse[]
+        | select(.ApplicationType == ($ENV.APPLICATION_TYPE // .ApplicationType))
+        | "\(.CFBundleIdentifier):\(.CFBundleDisplayName)"
+        + if .ApplicationType == "User" then " (\(.CFBundleVersion))" else "" end
+      '
+  )"})
   _describe -V 'bundle identifier' identifiers
 }
 
