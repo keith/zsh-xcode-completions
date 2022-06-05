@@ -57,3 +57,5 @@ simctl:
 	-xcrun simctl help icloud_sync
 	@echo
 	-xcrun simctl help pbsync
+	@echo
+	-xcrun simctl help pbcopy

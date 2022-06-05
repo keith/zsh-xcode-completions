@@ -36,6 +36,7 @@ _commands() {
     'list:List available devices, device types, runtimes, or device pairs.'
     'icloud_sync:Trigger iCloud sync on a device.'
     'pbsync:Sync the pasteboard content from one pasteboard to another.'
+    'pbcopy:Copy standard input onto the device pasteboard.'
   )
   _describe subcommand commands
 }
@@ -198,6 +199,12 @@ _options() {
         '-v' \
         ':source device:{_host; FILTER=booted _devices}' \
         ':destination device:{_host; FILTER=booted _devices}'
+      ;;
+
+    (pbcopy)
+      _arguments \
+        '-v' \
+        ':device:{_host; FILTER=booted _devices}'
       ;;
 
   esac

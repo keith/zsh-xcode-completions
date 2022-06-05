@@ -208,3 +208,7 @@ Sync the pasteboard content from one pasteboard to another.
 Usage: simctl pbsync [-pv] <source device or "host"> <destination device or "host">
 
  -p causes simctl to use promise data for secondary types.  simctl will continue to run to provide that promise data until something else replaces it on the pasteboard.
+
+xcrun simctl help pbcopy
+Copy standard input onto the device pasteboard.
+Usage: simctl pbcopy [-v] <device or "host">
