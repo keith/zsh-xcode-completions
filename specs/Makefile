@@ -61,3 +61,5 @@ simctl:
 	-xcrun simctl help pbpaste
 	@echo
 	-xcrun simctl help help
+	@echo
+	-xcrun simctl help io

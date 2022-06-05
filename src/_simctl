@@ -38,6 +38,7 @@ _commands() {
     'pbcopy:Copy standard input onto the device pasteboard.'
     'pbpaste:Print the contents of the device'"'"'s pasteboard to standard output.'
     'help:Prints the usage for a given subcommand.'
+    'io:Set up a device IO operation.'
   )
   _describe subcommand commands
 }
@@ -209,7 +210,77 @@ _options() {
         ': :_commands'
       ;;
 
+    (io)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        '*:: :_io'
+      ;;
+
   esac
+}
+
+_io() {
+  _arguments \
+    ':operation:_io_operations' \
+    '*::arguments:_io_op_arguments'
+}
+
+_io_operations() {
+  local -a operations
+  operations=(
+    'enumerate:Lists all available IO ports and descriptor states.'
+    'recordVideo:Records the display to a QuickTime movie at the specified file or url.'
+    'screenshot:Saves a screenshot as a PNG to the specified file or url(use "-" for stdout).'
+  )
+  _describe operation operations
+}
+
+_io_op_arguments() {
+  case $line[1] in
+
+    (enumerate)
+      _arguments \
+        '--poll[Poll after enumeration.]'
+      ;;
+
+    (recordVideo)
+      _arguments \
+        '--codec=-[Specifies the codec type]:codec:(h264 hevc)' \
+        '--display=-:display:(internal external)' \
+        '--mask=-[For non-rectangular displays, handle the mask by policy]:policy:_io_record_masks' \
+        '--force[Force the output file to be written to, even if the file already exists.]' \
+        ':file or url:_files'
+      ;;
+
+    (screenshot)
+      _arguments \
+        '--type=-:type:(png tiff bmp gif jpeg)' \
+        '--display=-:display:(internal external)' \
+        '--mask=-[For non-rectangular displays, handle the mask by policy]:policy:_io_screenshot_masks' \
+        ':file or url:_files'
+      ;;
+
+  esac
+}
+
+_io_record_masks() {
+  local -a masks
+  masks=(
+    'ignored:The mask is ignored and the unmasked framebuffer is saved.'
+    'alpha:Not supported, but retained for compatibility; the mask is rendered black.'
+    'black:The mask is rendered black.'
+  )
+  _describe mask masks
+}
+
+_io_screenshot_masks() {
+  local -a masks
+  masks=(
+    'ignored:The mask is ignored and the unmasked framebuffer is saved.'
+    'alpha:The mask is used as premultiplied alpha.'
+    'black:The mask is rendered black.'
+  )
+  _describe mask masks
 }
 
 _devicetypes() {
