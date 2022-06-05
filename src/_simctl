@@ -177,15 +177,11 @@ _runtimes() {
   local -a runtimes
   runtimes=(${(f)"$(xcrun simctl list -j | jq -r '
     (
-      if $ENV.DEVICETYPE | length > 0 then
-        $ENV.DEVICETYPE
-      elif $ENV.DEVICE | length > 0 then
-        first(.devices[][] | select(.udid == $ENV.DEVICE)).deviceTypeIdentifier // ""
-      else
-        ""
-      end
-    ) as $devicetype |
-    (
+      $ENV.DEVICETYPE
+      // first(.devices[][] | select(.udid == ($ENV.DEVICE // "none"))).deviceTypeIdentifier
+      // ""
+    ) as $devicetype
+    | (
       .devicetypes | map(select(
         ((.identifier | ascii_downcase) | contains($devicetype | ascii_downcase))
         or ((.name | ascii_downcase) | contains($devicetype | ascii_downcase))
