@@ -11,7 +11,6 @@ _simctl() {
 _commands() {
   local -a commands
   commands=(
-    'help:Prints the usage for a given subcommand.'
     'create:Create a new device.'
     'clone:Clone an existing device.'
     'upgrade:Upgrade a device to a newer runtime.'
@@ -38,16 +37,13 @@ _commands() {
     'pbsync:Sync the pasteboard content from one pasteboard to another.'
     'pbcopy:Copy standard input onto the device pasteboard.'
     'pbpaste:Print the contents of the device'"'"'s pasteboard to standard output.'
+    'help:Prints the usage for a given subcommand.'
   )
   _describe subcommand commands
 }
 
 _options() {
   case $line[1] in
-
-    (help)
-      _arguments ': :_commands'
-      ;;
 
     (create)
       _arguments \
@@ -206,6 +202,11 @@ _options() {
       _arguments \
         '-v' \
         ':device:{FILTER=booted _devices}'
+      ;;
+
+    (help)
+      _arguments \
+        ': :_commands'
       ;;
 
   esac

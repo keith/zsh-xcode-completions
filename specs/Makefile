@@ -8,8 +8,6 @@ FORCE:
 simctl:
 	xcrun simctl || true
 	@echo
-	-xcrun simctl help help
-	@echo
 	-xcrun simctl help create
 	@echo
 	-xcrun simctl help clone
@@ -61,3 +59,5 @@ simctl:
 	-xcrun simctl help pbcopy
 	@echo
 	-xcrun simctl help pbpaste
+	@echo
+	-xcrun simctl help help
