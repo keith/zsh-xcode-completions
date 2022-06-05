@@ -40,6 +40,7 @@ _commands() {
     'help:Prints the usage for a given subcommand.'
     'io:Set up a device IO operation.'
     'diagnose:Collect diagnostic information and logs.'
+    'logverbose:enable or disable verbose logging for a device'
   )
   _describe subcommand commands
 }
@@ -227,6 +228,12 @@ _options() {
 	'--all-logs[Include all device logs, even for non-booted devices.]' \
 	'--data-containers[Include booted device(s) data directory.]' \
 	'--udid=-[Collect diagnostics only from the specified device.]:device:_devices'
+      ;;
+
+    (logverbose)
+      _arguments \
+        '::device:{FILTER=booted _devices}' \
+        ':state:(enable disable)'
       ;;
 
   esac

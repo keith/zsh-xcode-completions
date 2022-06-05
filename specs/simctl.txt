@@ -289,3 +289,13 @@ NOTE: If there are booted devices only logs from those devices are collected by 
 
 NOTE: You can run 'simctl logverbose <device> enable' to enable verbose logging and reboot the device before reproducing the problem and running 'simctl diagnose'.
 
+
+xcrun simctl help logverbose
+enable or disable verbose logging for a device
+Usage: simctl logverbose [<device>] (enable | disable)
+	<device>         The device. If not provided all booted devices are affected.
+	enable           Enables verbose logging
+	disable          Disables verbose logging
+
+NOTE: You may need to reboot the affected device before logging changes will be effective.
+
