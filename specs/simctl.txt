@@ -157,3 +157,20 @@ xcrun simctl help install_app_data
 Install an xcappdata package to a device, replacing the current contents of the container.
 Usage: simctl install_app_data <device> <path to xcappdata package>
 	 This will replace the current contents of the container. If the app is currently running it will be terminated before the container is replaced.
+
+xcrun simctl help launch
+Launch an application by identifier on a device.
+Usage: simctl launch [-w | --wait-for-debugger] [--console|--console-pty] [--stdout=<path>] [--stderr=<path>] [--terminate-running-process] <device> <app bundle identifier> [<argv 1> <argv 2> ... <argv n>]
+
+	--console Block and print the application's stdout and stderr to the current terminal.
+		Signals received by simctl are passed through to the application.
+		(Cannot be combined with --stdout or --stderr)
+	--console-pty Block and print the application's stdout and stderr to the current terminal via a PTY.
+		Signals received by simctl are passed through to the application.
+		(Cannot be combined with --stdout or --stderr)
+	--stdout=<path> Redirect the application's standard output to a file.
+	--stderr=<path> Redirect the application's standard error to a file.
+	--terminate-running-process Terminate any running copy of the application.
+		Note: Log output is often directed to stderr, not stdout.
+
+If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.

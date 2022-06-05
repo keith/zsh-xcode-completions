@@ -45,3 +45,5 @@ simctl:
 	-xcrun simctl help get_app_container
 	@echo
 	-xcrun simctl help install_app_data
+	@echo
+	-xcrun simctl help launch

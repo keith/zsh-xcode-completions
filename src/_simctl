@@ -30,6 +30,7 @@ _commands() {
     'uninstall:Uninstall an app from a device.'
     'get_app_container:Print the path of the installed app'"'"'s container'
     'install_app_data:Install an xcappdata package to a device, replacing the current contents of the container.'
+    'launch:Launch an application by identifier on a device.'
   )
   _describe subcommand commands
 }
@@ -141,6 +142,19 @@ _options() {
       _arguments \
         ':device:{FILTER=booted _devices}' \
         ':path:_files -g \*.xcappdata'
+      ;;
+
+    (launch)
+      _arguments \
+        '(-w --wait-for-debugger)'{-w,--wait-for-debugger} \
+        '(--console-pty --stdout --stderr)--console[Block and print the application'"'"'s stdout and stderr to the current terminal.]' \
+        '(--console --stdout --stderr)--console-pty[Block and print the application'"'"'s stdout and stderr to the current terminal via a PTY.]' \
+        '(--console --console-pty)--stdout=-[Redirect the application'"'"'s standard output to a file.]: :_files' \
+        '(--console --console-pty)--stderr=-[Redirect the application'"'"'s standard error to a file.]: :_files' \
+        '--terminate-running-process[Terminate any running copy of the application.]' \
+        ':device:{FILTER=booted _devices}' \
+        ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}' \
+        '*::argv:'
       ;;
 
   esac
