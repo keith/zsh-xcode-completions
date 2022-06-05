@@ -132,7 +132,7 @@ _options() {
     (get_app_container)
       _arguments \
         ':device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[2]} APPLICATION_TYPE=User _bundle_identifiers; DEVICE=${(Q)words[2]} APPLICATION_TYPE=System _bundle_identifiers}' \
+        ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}' \
         ':container:{DEVICE=${(Q)words[2]} BUNDLE_IDENTIFIER=${(Q)words[3]} _containers}'
       ;;
 
@@ -240,7 +240,7 @@ _bundle_identifiers() {
   identifiers=(${(f)"$(
     xcrun simctl listapps "$DEVICE" |
       plutil -convert json - -o - |
-      jq -r '.[] | select(.ApplicationType == $ENV.APPLICATION_TYPE) | .CFBundleIdentifier'
+      jq -r '[.[]] | sort_by(.ApplicationType) | reverse[] | select(.ApplicationType == ($ENV.APPLICATION_TYPE // .ApplicationType)) | .CFBundleIdentifier'
     )"})
   _describe -V 'bundle identifier' identifiers
 }
