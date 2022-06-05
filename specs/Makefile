@@ -63,3 +63,5 @@ simctl:
 	-xcrun simctl help help
 	@echo
 	-xcrun simctl help io
+	@echo
+	-xcrun simctl help diagnose

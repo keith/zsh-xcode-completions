@@ -263,3 +263,29 @@ Example:
 	simctl io booted screenshot screenshot.png
 
 
+
+xcrun simctl help diagnose
+Collect diagnostic information and logs.
+Usage: simctl diagnose [-bX] [--timeout=<duration>] [--output=<path>] [--no-archive] [--all-logs] [--data-containers] [--udid=<device> [--udid=<device> [...]]]
+
+	-b                Do NOT show the resulting archive in a Finder window upon completion.
+	-X                Run all diagnostics with no timeout. It ignores the --timeout value if it is specified.
+	--timeout         Specify a duration (in seconds) to wait for the log collection before timeout.
+	--output          Specify the output directory.
+	                  If not provided the temporary directory is used.
+	--no-archive      Do not create an archive, leave the collected files uncompressed.
+	--all-logs        Include all device logs, even for non-booted devices.
+	--data-container  Include booted device(s) data directory.
+	                  Warning: May include private information, app data containers,
+	                  and increases the size of the archive!
+	                  Default is NOT to collect the data container.
+	--udid            Collect diagnostics only from the specified device. This option
+	                  may be specified more than once to consider multiple devices.
+	                  The --all-logs option causes all --udid options to be ignored.
+
+Please provide simctl diagnose output when filing bugs.
+
+NOTE: If there are booted devices only logs from those devices are collected by default, otherwise --all-logs is assumed. More information can be collected from a booted device so you should prefer leaving affected simulators booted when running simctl diagnose. 
+
+NOTE: You can run 'simctl logverbose <device> enable' to enable verbose logging and reboot the device before reproducing the problem and running 'simctl diagnose'.
+

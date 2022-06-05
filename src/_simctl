@@ -39,6 +39,7 @@ _commands() {
     'pbpaste:Print the contents of the device'"'"'s pasteboard to standard output.'
     'help:Prints the usage for a given subcommand.'
     'io:Set up a device IO operation.'
+    'diagnose:Collect diagnostic information and logs.'
   )
   _describe subcommand commands
 }
@@ -214,6 +215,18 @@ _options() {
       _arguments \
         ':device:{FILTER=booted _devices}' \
         '*:: :_io'
+      ;;
+
+    (diagnose)
+      _arguments \
+	'-b[Do NOT show the resulting archive in a Finder window upon completion.]' \
+	'-X[Run all diagnostics with no timeout. It ignores the --timeout value if it is specified.]' \
+	'--timeout=-[Specify a duration (in seconds) to wait for the log collection before timeout.]:duration:' \
+	'--output=-[Specify the output directory.]:path:_files -/' \
+	'--no-archive[Do not create an archive, leave the collected files uncompressed.]' \
+	'--all-logs[Include all device logs, even for non-booted devices.]' \
+	'--data-containers[Include booted device(s) data directory.]' \
+	'--udid=-[Collect diagnostics only from the specified device.]:device:_devices'
       ;;
 
   esac
