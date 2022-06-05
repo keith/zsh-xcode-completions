@@ -183,21 +183,15 @@ _devices() {
       | .devices |= with_entries(.value[].runtime = $runtimes[.key])
       | .devices[][] |= (.devicetype = $devicetypes[.deviceTypeIdentifier])
       | [.devices[][]] | sort_by(.logPathSize) | reverse[]
-      | select(
-        if $ENV.FILTER == "available_shutdown" then
-          .isAvailable and .state == "Shutdown"
-        elif $ENV.FILTER == "shutdown" then
-          .state == "Shutdown"
-        elif $ENV.FILTER == "booted" then
-          .state == "Booted"
-        elif $ENV.FILTER == "watches" then
-          .devicetype.productFamily == "Apple Watch"
-        elif $ENV.FILTER == "phones" then
-          .devicetype.productFamily == "iPhone"
-        else
-          true
-        end
-      )
+      | select(contains(
+        {
+          available_shutdown: {isAvailable: true, state: "Shutdown"},
+          shutdown: {state: "Shutdown"},
+          booted: {state: "Booted"},
+          watches: {devicetype: {productFamily: "Apple Watch"}},
+          phones: {devicetype: {productFamily: "iPhone"}},
+        }[$ENV.FILTER // "none"] // {}
+      ))
       | "\(.udid):\(.name) (\(.devicetype.name // "unknown type"), \(.runtime.name // .availabilityError)) (\(.state))"
     ')"})
   _describe -V device devices
@@ -230,16 +224,15 @@ _pairs() {
 
 _urls() {
   local -a urls
-  urls=(${(f)"$(
+  urls+=('http\://' 'https\://')
+  urls+=(${(f)"$(
     xcrun simctl listapps "$DEVICE" |
       plutil -convert json - -o - |
-      jq -r '.[] | select(.ApplicationType == "User") | .Path' |
-      while read app; do
-        plutil -convert json "$app"/Info.plist -o - | jq -r '.CFBundleURLTypes[]?.CFBundleURLSchemes[]? + "\\://"';
-      done
+      jq -r '[.[]] | sort_by(.ApplicationType) | reverse[].Path' |
+      while read app; do plutil -convert json "$app"/Info.plist -o -; done |
+      jq -r '[.CFBundleURLTypes[]?.CFBundleURLSchemes[]?] - ["http", "https"] | .[] + "\\:"'
     )"})
-  urls+=('http\://' 'https\://')
-  _describe url urls
+  _describe -V url urls
 }
 
 _bundle_identifiers() {
@@ -254,7 +247,7 @@ _bundle_identifiers() {
 
 _containers() {
   local -a containers
-  containers=(app data groups)
+  containers+=(app data groups)
   containers+=(${(f)"$(
     xcrun simctl listapps "$DEVICE" |
       plutil -convert json - -o - |
