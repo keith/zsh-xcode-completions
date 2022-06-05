@@ -47,7 +47,7 @@ _options() {
       _arguments \
         ':name:' \
         ':device type id:_devicetypes' \
-        '::runtime id:{DEVICETYPE=${(Q)words[3]} _runtimes}'
+        '::runtime id:{DEVICETYPE=${(Q)words[CURRENT-1]} _runtimes}'
       ;;
 
     (clone)
@@ -60,7 +60,7 @@ _options() {
     (upgrade)
       _arguments \
         ':device:{FILTER=shutdown _devices}' \
-        ':runtime id:{DEVICE=${(Q)words[2]} _runtimes}'
+        ':runtime id:{DEVICE=${(Q)words[CURRENT-1]} _runtimes}'
       ;;
 
     (delete)
@@ -111,7 +111,7 @@ _options() {
     (openurl)
       _arguments \
         ':device:{FILTER=booted _devices}' \
-        ':url:{DEVICE=${(Q)words[2]} _urls}'
+        ':url:{DEVICE=${(Q)words[CURRENT-1]} _urls}'
       ;;
 
     (addmedia)
@@ -129,14 +129,14 @@ _options() {
     (uninstall)
       _arguments \
         ':device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[2]} APPLICATION_TYPE=User _bundle_identifiers}'
+        ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} APPLICATION_TYPE=User _bundle_identifiers}'
       ;;
 
     (get_app_container)
       _arguments \
         ':device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}' \
-        ':container:{DEVICE=${(Q)words[2]} BUNDLE_IDENTIFIER=${(Q)words[3]} _containers}'
+        ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
+        ':container:{DEVICE=${(Q)words[CURRENT-2]} BUNDLE_IDENTIFIER=${(Q)words[CURRENT-1]} _containers}'
       ;;
 
     (install_app_data)
@@ -154,14 +154,14 @@ _options() {
         '(--console --console-pty)--stderr=-[Redirect the application'"'"'s standard error to a file.]: :_files' \
         '--terminate-running-process[Terminate any running copy of the application.]' \
         ':device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}' \
+        ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
         '*::argv:'
       ;;
 
     (terminate)
       _arguments \
         ':device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}'
+        ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}'
       ;;
 
   esac
