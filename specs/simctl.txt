@@ -212,3 +212,7 @@ Usage: simctl pbsync [-pv] <source device or "host"> <destination device or "hos
 xcrun simctl help pbcopy
 Copy standard input onto the device pasteboard.
 Usage: simctl pbcopy [-v] <device or "host">
+
+xcrun simctl help pbpaste
+Print the contents of the device's pasteboard to standard output.
+Usage: simctl pbpaste [-v] <device or "host">

@@ -59,3 +59,5 @@ simctl:
 	-xcrun simctl help pbsync
 	@echo
 	-xcrun simctl help pbcopy
+	@echo
+	-xcrun simctl help pbpaste
