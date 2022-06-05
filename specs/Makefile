@@ -49,3 +49,5 @@ simctl:
 	-xcrun simctl help launch
 	@echo
 	-xcrun simctl help terminate
+	@echo
+	-xcrun simctl help spawn

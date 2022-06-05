@@ -32,6 +32,7 @@ _commands() {
     'install_app_data:Install an xcappdata package to a device, replacing the current contents of the container.'
     'launch:Launch an application by identifier on a device.'
     'terminate:Terminate an application by identifier on a device.'
+    'spawn:Spawn a process by executing a given executable on a device.'
   )
   _describe subcommand commands
 }
@@ -162,6 +163,17 @@ _options() {
       _arguments \
         ':device:{FILTER=booted _devices}' \
         ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}'
+      ;;
+
+    (spawn)
+      _arguments \
+        '(-w --wait-for-debugger)'{-w,--wait-for-debugger} \
+        '(-s --standalone)'{-s,--standalone} \
+        '(--arch)-a:arch:' \
+        '(-a)--arch=-:arch:' \
+        ':device:{FILTER=booted _devices}' \
+        ':path:_files' \
+        '*::argv:'
       ;;
 
   esac
