@@ -154,7 +154,7 @@ _options() {
         '(--console --console-pty)--stdout=-[Redirect the application'"'"'s standard output to a file.]: :_files' \
         '(--console --console-pty)--stderr=-[Redirect the application'"'"'s standard error to a file.]: :_files' \
         '--terminate-running-process[Terminate any running copy of the application.]' \
-        ':device:{FILTER=booted _devices}' \
+        '(-):device:{FILTER=booted _devices}' \
         ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
         '*::argv:'
       ;;
@@ -171,7 +171,7 @@ _options() {
         '(-s --standalone)'{-s,--standalone} \
         '(--arch)-a:arch:' \
         '(-a)--arch=-:arch:' \
-        ':device:{FILTER=booted _devices}' \
+        '(-):device:{FILTER=booted _devices}' \
         ':path:_files' \
         '*::argv:'
       ;;
