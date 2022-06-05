@@ -28,6 +28,7 @@ _commands() {
     'addmedia:Add photos, live photos, videos, or contacts to the library of a device.'
     'install:Install an app on a device.'
     'uninstall:Uninstall an app from a device.'
+    'get_app_container:Print the path of the installed app'"'"'s container'
   )
   _describe subcommand commands
 }
@@ -125,7 +126,14 @@ _options() {
     (uninstall)
       _arguments \
         ':device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}'
+        ':app bundle identifier:{DEVICE=${(Q)words[2]} APPLICATION_TYPE=User _bundle_identifiers}'
+      ;;
+
+    (get_app_container)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        ':app bundle identifier:{DEVICE=${(Q)words[2]} APPLICATION_TYPE=User _bundle_identifiers; DEVICE=${(Q)words[2]} APPLICATION_TYPE=System _bundle_identifiers}' \
+        ':container:{DEVICE=${(Q)words[2]} BUNDLE_IDENTIFIER=${(Q)words[3]} _containers}'
       ;;
 
   esac
@@ -239,7 +247,18 @@ _bundle_identifiers() {
   identifiers=(${(f)"$(
     xcrun simctl listapps "$DEVICE" |
       plutil -convert json - -o - |
-      jq -r '.[] | select(.ApplicationType == "User") | .CFBundleIdentifier'
+      jq -r '.[] | select(.ApplicationType == $ENV.APPLICATION_TYPE) | .CFBundleIdentifier'
     )"})
-  _describe 'bundle identifier' identifiers
+  _describe -V 'bundle identifier' identifiers
+}
+
+_containers() {
+  local -a containers
+  containers=(app data groups)
+  containers+=(${(f)"$(
+    xcrun simctl listapps "$DEVICE" |
+      plutil -convert json - -o - |
+      jq -r '.[] | select(.CFBundleIdentifier == $ENV.BUNDLE_IDENTIFIER) | .GroupContainers | keys[]'
+    )"})
+  _describe -V container containers
 }

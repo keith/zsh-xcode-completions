@@ -140,3 +140,15 @@ Usage: simctl install <device> <path>
 xcrun simctl help uninstall
 Uninstall an app from a device.
 Usage: simctl uninstall <device> <app bundle identifier>
+
+xcrun simctl help get_app_container
+Print the path of the installed app's container
+Usage: simctl get_app_container <device> <app bundle identifier> [<container>]
+
+container   Optionally specify the container. Defaults to app.
+  app                 The .app bundle
+  data                The application's data container
+  groups              The App Group containers
+  <group identifier>  A specific App Group container
+
+

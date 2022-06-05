@@ -41,3 +41,5 @@ simctl:
 	-xcrun simctl help install
 	@echo
 	-xcrun simctl help uninstall
+	@echo
+	-xcrun simctl help get_app_container
