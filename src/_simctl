@@ -31,6 +31,7 @@ _commands() {
     'get_app_container:Print the path of the installed app'"'"'s container'
     'install_app_data:Install an xcappdata package to a device, replacing the current contents of the container.'
     'launch:Launch an application by identifier on a device.'
+    'terminate:Terminate an application by identifier on a device.'
   )
   _describe subcommand commands
 }
@@ -155,6 +156,12 @@ _options() {
         ':device:{FILTER=booted _devices}' \
         ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}' \
         '*::argv:'
+      ;;
+
+    (terminate)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}'
       ;;
 
   esac

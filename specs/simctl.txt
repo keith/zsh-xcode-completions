@@ -174,3 +174,7 @@ Usage: simctl launch [-w | --wait-for-debugger] [--console|--console-pty] [--std
 		Note: Log output is often directed to stderr, not stdout.
 
 If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
+
+xcrun simctl help terminate
+Terminate an application by identifier on a device.
+Usage: simctl terminate <device> <app bundle identifier>

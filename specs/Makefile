@@ -47,3 +47,5 @@ simctl:
 	-xcrun simctl help install_app_data
 	@echo
 	-xcrun simctl help launch
+	@echo
+	-xcrun simctl help terminate
