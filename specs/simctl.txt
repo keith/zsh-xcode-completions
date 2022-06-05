@@ -152,3 +152,8 @@ container   Optionally specify the container. Defaults to app.
   <group identifier>  A specific App Group container
 
 
+
+xcrun simctl help install_app_data
+Install an xcappdata package to a device, replacing the current contents of the container.
+Usage: simctl install_app_data <device> <path to xcappdata package>
+	 This will replace the current contents of the container. If the app is currently running it will be terminated before the container is replaced.

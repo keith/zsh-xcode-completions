@@ -29,6 +29,7 @@ _commands() {
     'install:Install an app on a device.'
     'uninstall:Uninstall an app from a device.'
     'get_app_container:Print the path of the installed app'"'"'s container'
+    'install_app_data:Install an xcappdata package to a device, replacing the current contents of the container.'
   )
   _describe subcommand commands
 }
@@ -134,6 +135,12 @@ _options() {
         ':device:{FILTER=booted _devices}' \
         ':app bundle identifier:{DEVICE=${(Q)words[2]} _bundle_identifiers}' \
         ':container:{DEVICE=${(Q)words[2]} BUNDLE_IDENTIFIER=${(Q)words[3]} _containers}'
+      ;;
+
+    (install_app_data)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        ':path:_files -g \*.xcappdata'
       ;;
 
   esac
