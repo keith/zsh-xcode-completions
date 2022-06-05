@@ -198,3 +198,7 @@ Usage: simctl list [-j | --json] [-v] [devices|devicetypes|runtimes|pairs] [<sea
 
 Specify one of 'devices', 'devicetypes', 'runtimes', or 'pairs' to list only items of that type. If a type filter is specified you may also specify a search term. Search terms use a simple case-insensitive contains check against the item's description. You may use the search term 'available' to only list available items.
 
+
+xcrun simctl help icloud_sync
+Trigger iCloud sync on a device.
+Usage: simctl icloud_sync <device>

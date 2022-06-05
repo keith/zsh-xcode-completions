@@ -53,3 +53,5 @@ simctl:
 	-xcrun simctl help spawn
 	@echo
 	-xcrun simctl help list
+	@echo
+	-xcrun simctl help icloud_sync

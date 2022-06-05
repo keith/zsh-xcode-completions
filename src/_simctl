@@ -34,6 +34,7 @@ _commands() {
     'terminate:Terminate an application by identifier on a device.'
     'spawn:Spawn a process by executing a given executable on a device.'
     'list:List available devices, device types, runtimes, or device pairs.'
+    'icloud_sync:Trigger iCloud sync on a device.'
   )
   _describe subcommand commands
 }
@@ -183,6 +184,11 @@ _options() {
         '-v[More verbose output]' \
         ':list:(devices devicetypes runtimes pairs)' \
         '::search term:(available)'
+      ;;
+
+    (icloud_sync)
+      _arguments \
+        ':device:{FILTER=booted _devices}'
       ;;
 
   esac
