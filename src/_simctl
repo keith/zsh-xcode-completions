@@ -26,6 +26,7 @@ _commands() {
     'getenv:Print an environment variable from a running device.'
     'openurl:Open a URL in a device.'
     'addmedia:Add photos, live photos, videos, or contacts to the library of a device.'
+    'install:Install an app on a device.'
   )
   _describe subcommand commands
 }
@@ -112,6 +113,12 @@ _options() {
       _arguments \
         ':device:{FILTER=booted _devices}' \
         '*:path:_files'
+      ;;
+
+    (install)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        ':path:_files -/'
       ;;
 
   esac

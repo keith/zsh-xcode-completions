@@ -132,3 +132,7 @@ You can specify multiple files including a mix of photos, videos, and contacts.
 You can also specify multiple live photos by providing the photo and video files. They will automatically be discovered and imported correctly.
 
 Contacts support the vCard format.
+
+xcrun simctl help install
+Install an app on a device.
+Usage: simctl install <device> <path>

@@ -37,3 +37,5 @@ simctl:
 	-xcrun simctl help openurl
 	@echo
 	-xcrun simctl help addmedia
+	@echo
+	-xcrun simctl help install
