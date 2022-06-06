@@ -41,6 +41,7 @@ _commands() {
     'io:Set up a device IO operation.'
     'diagnose:Collect diagnostic information and logs.'
     'logverbose:enable or disable verbose logging for a device'
+    'status_bar:Set or clear status bar overrides'
   )
   _describe subcommand commands
 }
@@ -236,6 +237,12 @@ _options() {
         ':state:(enable disable)'
       ;;
 
+    (status_bar)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        '*:: :_status_bar'
+      ;;
+
   esac
 }
 
@@ -303,6 +310,40 @@ _io_screenshot_masks() {
   _describe mask masks
 }
 
+_status_bar() {
+  _arguments \
+    ':operation:_status_bar_operations' \
+    '*::arguments:_status_bar_arguments'
+}
+
+_status_bar_operations() {
+  local -a operations
+  operations=(
+    'list:List existing overrides.'
+    'clear:Clear all existing status bar overrides.'
+    'override:Set status bar override values.'
+  )
+  _describe operation operations
+}
+
+_status_bar_arguments() {
+  case $line[1] in
+
+    (override)
+      _arguments \
+	'--time=:string or ISO date:' \
+        '--dataNetwork=:type:(hide wifi 3g 4g lte lte-a lte+ 5g 5g+ 5g-uwb)' \
+        '--wifiMode=:mode:(searching failed active)' \
+        '--wifiBars=:number:(0 1 2 3)' \
+        '--cellularMode=:mode:(notSupported searching failed  active)' \
+        '--cellularBars=:number:(0 1 2 3 4)' \
+        '--operatorName=:name:' \
+        '--batteryState=:state:(charging charged discharging)' \
+        '--batteryLevel=:percent:'
+      ;;
+
+  esac
+}
 _devicetypes() {
   local -a devicetypes
   devicetypes=(${(f)"$(xcrun simctl list devicetypes -j | jq -r '.devicetypes[].name')"})
