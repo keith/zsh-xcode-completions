@@ -44,6 +44,7 @@ _commands() {
     'status_bar:Set or clear status bar overrides'
     'ui:Get or Set UI options'
     'push:Send a simulated push notification'
+    'privacy:Grant, revoke, or reset privacy and permissions'
   )
   _describe subcommand commands
 }
@@ -258,6 +259,14 @@ _options() {
         ':json file or -:_files -g \*.json'
       ;;
 
+    (privacy)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        ':action:_privacy_actions' \
+        ':service:_privacy_services' \
+        '::bundle identifier:{DEVICE=${(Q)words[CURRENT-3]} _bundle_identifiers}'
+      ;;
+
   esac
 }
 
@@ -386,6 +395,37 @@ _ui_arguments() {
 
   esac
 }
+
+_privacy_actions() {
+  local -a actions
+  actions=(
+    'grant:Grant access without prompting. Requires bundle identifier.'
+    'revoke:Revoke access, denying all use of the service. Requires bundle identifier.'
+    'reset:Reset access, prompting on next use. Bundle identifier optional.'
+  )
+  _describe action actions
+}
+
+_privacy_services() {
+  local -a services
+  services=(
+    'all:Apply the action to all services.'
+    'calendar:Allow access to calendar.'
+    'contacts-limited:Allow access to basic contact info.'
+    'contacts:Allow access to full contact details.'
+    'location:Allow access to location services when app is in use.'
+    'location-always:Allow access to location services at all times.'
+    'photos-add:Allow adding photos to the photo library.'
+    'photos:Allow full access to the photo library.'
+    'media-library:Allow access to the media library.'
+    'microphone:Allow access to audio input.'
+    'motion:Allow access to motion and fitness data.'
+    'reminders:Allow access to reminders.'
+    'siri:Allow use of the app with Siri.'
+  )
+  _describe service services
+}
+
 _devicetypes() {
   local -a devicetypes
   devicetypes=(${(f)"$(xcrun simctl list devicetypes -j | jq -r '.devicetypes[].name')"})

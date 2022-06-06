@@ -73,3 +73,5 @@ simctl:
 	-xcrun simctl help ui
 	@echo
 	-xcrun simctl help push
+	@echo
+	-xcrun simctl help privacy
