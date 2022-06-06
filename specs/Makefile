@@ -77,3 +77,5 @@ simctl:
 	-xcrun simctl help privacy
 	@echo
 	-xcrun simctl help keychain
+	@echo
+	xcrun simctl listapps || true

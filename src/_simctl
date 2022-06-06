@@ -46,6 +46,7 @@ _commands() {
     'push:Send a simulated push notification'
     'privacy:Grant, revoke, or reset privacy and permissions'
     'keychain:Manipulate a device'"'"'s keychain'
+    'listapps:Show the installed applications.'
   )
   _describe subcommand commands
 }
@@ -193,7 +194,7 @@ _options() {
         '::search term:(available)'
       ;;
 
-    (icloud_sync)
+    (icloud_sync|listapps)
       _arguments \
         ':device:{FILTER=booted _devices}'
       ;;
@@ -516,7 +517,7 @@ _devices_all() {
   devices=(
     all:'All devices'
   )
-  _describe -V special devices
+  _describe -V device devices
 }
 
 _devices_unavailable() {
@@ -524,7 +525,7 @@ _devices_unavailable() {
   devices=(
     unavailable:'Devices not supported by the current Xcode SDK'
   )
-  _describe -V special devices
+  _describe -V device devices
 }
 
 _pairs() {

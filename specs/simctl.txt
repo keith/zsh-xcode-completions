@@ -450,3 +450,7 @@ Usage: simctl keychain <device> <action> [arguments]
         Reset the keychain.
 
 
+
+xcrun simctl listapps || true
+Show the installed applications.
+Usage: simctl listapps <device>
