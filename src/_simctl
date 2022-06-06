@@ -1,5 +1,11 @@
 #compdef simctl
 
+# TODO: remove unneeded inline descriptions
+# TODO: understand groups, split on groups
+# TODO: too aggressive booted filtering?
+# TODO: use booted device?
+# TODO: cleanup/format descriptions
+
 _simctl() {
   _arguments \
     '--set: :_files -/' \
