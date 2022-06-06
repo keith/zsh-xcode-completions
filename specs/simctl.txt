@@ -451,6 +451,6 @@ Usage: simctl keychain <device> <action> [arguments]
 
 
 
-xcrun simctl listapps || true
+xcrun simctl help listapps
 Show the installed applications.
 Usage: simctl listapps <device>
