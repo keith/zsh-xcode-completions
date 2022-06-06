@@ -45,6 +45,7 @@ _commands() {
     'ui:Get or Set UI options'
     'push:Send a simulated push notification'
     'privacy:Grant, revoke, or reset privacy and permissions'
+    'keychain:Manipulate a device'"'"'s keychain'
   )
   _describe subcommand commands
 }
@@ -267,6 +268,12 @@ _options() {
         '::bundle identifier:{DEVICE=${(Q)words[CURRENT-3]} _bundle_identifiers}'
       ;;
 
+    (keychain)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        '*:: :_keychain'
+      ;;
+
   esac
 }
 
@@ -424,6 +431,33 @@ _privacy_services() {
     'siri:Allow use of the app with Siri.'
   )
   _describe service services
+}
+
+_keychain() {
+  _arguments \
+    ':option:_keychain_actions' \
+    '*:: :_keychain_arguments'
+}
+
+_keychain_actions() {
+  local -a actions
+  actions=(
+    'add-root-cert:Add a certificate to the trusted root store.'
+    'add-cert:Add a certificate to the keychain.'
+    'reset:Reset the keychain.'
+  )
+  _describe action actions
+}
+
+_keychain_arguments() {
+  case $line[1] in
+
+    (add-root-cert|add-cert)
+      _arguments \
+        ':path:_files -g \*.cer -g \*.pem'
+      ;;
+
+  esac
 }
 
 _devicetypes() {

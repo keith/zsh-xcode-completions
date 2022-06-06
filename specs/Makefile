@@ -75,3 +75,5 @@ simctl:
 	-xcrun simctl help push
 	@echo
 	-xcrun simctl help privacy
+	@echo
+	-xcrun simctl help keychain

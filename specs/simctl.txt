@@ -435,3 +435,18 @@ Warning:
 Normally applications must have valid Info.plist usage description keys and follow the API guidelines to request access to services. Using this command to bypass those requirements can mask bugs.
 
 
+
+xcrun simctl help keychain
+Manipulate a device's keychain
+Usage: simctl keychain <device> <action> [arguments]
+
+    add-root-cert [path]
+        Add a certificate to the trusted root store.
+
+    add-cert [path]
+        Add a certificate to the keychain.
+
+    reset
+        Reset the keychain.
+
+
