@@ -1,9 +1,6 @@
 #compdef simctl
 
 # TODO: understand groups, split on groups
-# TODO: too aggressive booted filtering?
-# TODO: use booted device?
-# TODO: cleanup/format descriptions
 
 _simctl() {
   _arguments \
@@ -16,42 +13,42 @@ _simctl() {
 _commands() {
   local -a commands
   commands=(
-    'create:Create a new device.'
-    'clone:Clone an existing device.'
-    'upgrade:Upgrade a device to a newer runtime.'
-    'delete:Delete specified devices, unavailable devices, or all devices.'
-    'pair:Create a new watch and phone pair.'
-    'unpair:Unpair a watch and phone pair.'
-    'pair_activate:Set a given pair as active.'
-    'erase:Erase a device'"'"'s contents and settings.'
-    'boot:Boot a device or device pair.'
-    'shutdown:Shutdown a device.'
-    'rename:Rename a device.'
-    'getenv:Print an environment variable from a running device.'
-    'openurl:Open a URL in a device.'
-    'addmedia:Add photos, live photos, videos, or contacts to the library of a device.'
-    'install:Install an app on a device.'
-    'uninstall:Uninstall an app from a device.'
-    'get_app_container:Print the path of the installed app'"'"'s container'
-    'install_app_data:Install an xcappdata package to a device, replacing the current contents of the container.'
-    'launch:Launch an application by identifier on a device.'
-    'terminate:Terminate an application by identifier on a device.'
-    'spawn:Spawn a process by executing a given executable on a device.'
-    'list:List available devices, device types, runtimes, or device pairs.'
-    'icloud_sync:Trigger iCloud sync on a device.'
-    'pbsync:Sync the pasteboard content from one pasteboard to another.'
-    'pbcopy:Copy standard input onto the device pasteboard.'
-    'pbpaste:Print the contents of the device'"'"'s pasteboard to standard output.'
-    'help:Prints the usage for a given subcommand.'
-    'io:Set up a device IO operation.'
-    'diagnose:Collect diagnostic information and logs.'
+    'create:create a new device'
+    'clone:clone an existing device'
+    'upgrade:upgrade a device to a newer runtime'
+    'delete:delete specified devices, unavailable devices, or all devices'
+    'pair:create a new watch and phone pair'
+    'unpair:unpair a watch and phone pair'
+    'pair_activate:set a given pair as active'
+    'erase:erase a device'"'"'s contents and settings'
+    'boot:boot a device or device pair'
+    'shutdown:shutdown a device'
+    'rename:rename a device'
+    'getenv:print an environment variable from a running device'
+    'openurl:open a URL in a device'
+    'addmedia:add photos, live photos, videos, or contacts to the library of a device'
+    'install:install an app on a device'
+    'uninstall:uninstall an app from a device'
+    'get_app_container:print the path of the installed app'"'"'s container'
+    'install_app_data:install an xcappdata package to a device, replacing the current contents of the container'
+    'launch:launch an application by identifier on a device'
+    'terminate:terminate an application by identifier on a device'
+    'spawn:spawn a process by executing a given executable on a device'
+    'list:list available devices, device types, runtimes, or device pairs'
+    'icloud_sync:trigger iCloud sync on a device'
+    'pbsync:sync the pasteboard content from one pasteboard to another'
+    'pbcopy:copy standard input onto the device pasteboard'
+    'pbpaste:print the contents of the device'"'"'s pasteboard to standard output'
+    'help:prints the usage for a given subcommand'
+    'io:set up a device IO operation'
+    'diagnose:collect diagnostic information and logs'
     'logverbose:enable or disable verbose logging for a device'
-    'status_bar:Set or clear status bar overrides'
-    'ui:Get or Set UI options'
-    'push:Send a simulated push notification'
-    'privacy:Grant, revoke, or reset privacy and permissions'
-    'keychain:Manipulate a device'"'"'s keychain'
-    'listapps:Show the installed applications.'
+    'status_bar:set or clear status bar overrides'
+    'ui:get or set UI options'
+    'push:send a simulated push notification'
+    'privacy:grant, revoke, or reset privacy and permissions'
+    'keychain:manipulate a device'"'"'s keychain'
+    'listapps:show the installed applications'
   )
   _describe subcommand commands
 }
@@ -103,8 +100,8 @@ _options() {
     (boot)
       _arguments \
         ': :{FILTER=available_shutdown _devices; _pairs}' \
-        '--disabledJob=-[Disables the given launchd job.]' \
-        '--enabledJob=-[Enables the given launchd job when it would normally be disabled.]'
+        '--disabledJob=-[disables the given launchd job]' \
+        '--enabledJob=-[enables the given launchd job when it would normally be disabled]'
       ;;
 
     (shutdown)
@@ -164,11 +161,11 @@ _options() {
     (launch)
       _arguments \
         '(-w --wait-for-debugger)'{-w,--wait-for-debugger} \
-        '(--console-pty --stdout --stderr)--console[Block and print the application'"'"'s stdout and stderr to the current terminal.]' \
-        '(--console --stdout --stderr)--console-pty[Block and print the application'"'"'s stdout and stderr to the current terminal via a PTY.]' \
-        '(--console --console-pty)--stdout=-[Redirect the application'"'"'s standard output to a file.]: :_files' \
-        '(--console --console-pty)--stderr=-[Redirect the application'"'"'s standard error to a file.]: :_files' \
-        '--terminate-running-process[Terminate any running copy of the application.]' \
+        '(--console-pty --stdout --stderr)--console[block and print the application'"'"'s stdout and stderr to the current terminal]' \
+        '(--console --stdout --stderr)--console-pty[block and print the application'"'"'s stdout and stderr to the current terminal via a PTY]' \
+        '(--console --console-pty)--stdout=-[redirect the application'"'"'s standard output to a file]: :_files' \
+        '(--console --console-pty)--stderr=-[redirect the application'"'"'s standard error to a file]: :_files' \
+        '--terminate-running-process[terminate any running copy of the application]' \
         '(-): :{FILTER=booted _devices}' \
         ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
         '*::argv:'
@@ -193,8 +190,8 @@ _options() {
 
     (list)
       _arguments \
-        '(-j --json)'{-j,--json}'[Print as JSON.]' \
-        '-v[More verbose output]' \
+        '(-j --json)'{-j,--json}'[print as JSON]' \
+        '-v[more verbose output]' \
         ':list:(devices devicetypes runtimes pairs)' \
         '::search term:(available)'
       ;;
@@ -231,14 +228,14 @@ _options() {
 
     (diagnose)
       _arguments \
-	'-b[Do NOT show the resulting archive in a Finder window upon completion.]' \
-	'-X[Run all diagnostics with no timeout. It ignores the --timeout value if it is specified.]' \
-	'--timeout=-[Specify a duration (in seconds) to wait for the log collection before timeout.]:duration:' \
-	'--output=-[Specify the output directory.]:path:_files -/' \
-	'--no-archive[Do not create an archive, leave the collected files uncompressed.]' \
-	'--all-logs[Include all device logs, even for non-booted devices.]' \
-	'--data-containers[Include booted device(s) data directory.]' \
-	'--udid=-[Collect diagnostics only from the specified device.]:device:_devices'
+	'-b[do NOT show the resulting archive in a Finder window upon completion]' \
+	'-X[run all diagnostics with no timeout]' \
+	'--timeout=-[specify a duration (in seconds) to wait for the log collection before timeout]:duration:' \
+	'--output=-[specify the output directory]:path:_files -/' \
+	'--no-archive[do not create an archive, leave the collected files uncompressed]' \
+	'--all-logs[include all device logs, even for non-booted devices]' \
+	'--data-containers[include booted device(s) data directory]' \
+	'--udid=-[collect diagnostics only from the specified device]:device:_devices'
       ;;
 
     (logverbose)
@@ -292,9 +289,9 @@ _io() {
 _io_operations() {
   local -a operations
   operations=(
-    'enumerate:Lists all available IO ports and descriptor states.'
-    'recordVideo:Records the display to a QuickTime movie at the specified file or url.'
-    'screenshot:Saves a screenshot as a PNG to the specified file or url(use "-" for stdout).'
+    'enumerate:lists all available IO ports and descriptor states'
+    'recordVideo:records the display to a QuickTime movie at the specified file or url'
+    'screenshot:saves a screenshot as a PNG to the specified file or url (use "-" for stdout)'
   )
   _describe operation operations
 }
@@ -304,15 +301,15 @@ _io_op_arguments() {
 
     (enumerate)
       _arguments \
-        '--poll[Poll after enumeration.]'
+        '--poll[poll after enumeration]'
       ;;
 
     (recordVideo)
       _arguments \
-        '--codec=-[Specifies the codec type]:codec:(h264 hevc)' \
+        '--codec=-[specifies the codec type]:codec:(h264 hevc)' \
         '--display=-:display:(internal external)' \
-        '--mask=-[For non-rectangular displays, handle the mask by policy]:policy:_io_record_masks' \
-        '--force[Force the output file to be written to, even if the file already exists.]' \
+        '--mask=-[for non-rectangular displays, handle the mask by policy]:policy:_io_record_masks' \
+        '--force[force the output file to be written to, even if the file already exists]' \
         ':file or url:_files'
       ;;
 
@@ -320,7 +317,7 @@ _io_op_arguments() {
       _arguments \
         '--type=-:type:(png tiff bmp gif jpeg)' \
         '--display=-:display:(internal external)' \
-        '--mask=-[For non-rectangular displays, handle the mask by policy]:policy:_io_screenshot_masks' \
+        '--mask=-[for non-rectangular displays, handle the mask by policy]:policy:_io_screenshot_masks' \
         ':file or url:_files'
       ;;
 
@@ -330,9 +327,9 @@ _io_op_arguments() {
 _io_record_masks() {
   local -a masks
   masks=(
-    'ignored:The mask is ignored and the unmasked framebuffer is saved.'
-    'alpha:Not supported, but retained for compatibility; the mask is rendered black.'
-    'black:The mask is rendered black.'
+    'ignored:the mask is ignored and the unmasked framebuffer is saved'
+    'alpha:not supported, but retained for compatibility; the mask is rendered black'
+    'black:the mask is rendered black'
   )
   _describe mask masks
 }
@@ -340,9 +337,9 @@ _io_record_masks() {
 _io_screenshot_masks() {
   local -a masks
   masks=(
-    'ignored:The mask is ignored and the unmasked framebuffer is saved.'
-    'alpha:The mask is used as premultiplied alpha.'
-    'black:The mask is rendered black.'
+    'ignored:the mask is ignored and the unmasked framebuffer is saved'
+    'alpha:the mask is used as premultiplied alpha'
+    'black:the mask is rendered black'
   )
   _describe mask masks
 }
@@ -356,9 +353,9 @@ _status_bar() {
 _status_bar_operations() {
   local -a operations
   operations=(
-    'list:List existing overrides.'
-    'clear:Clear all existing status bar overrides.'
-    'override:Set status bar override values.'
+    'list:list existing overrides'
+    'clear:clear all existing status bar overrides'
+    'override:set status bar override values'
   )
   _describe operation operations
 }
@@ -412,9 +409,9 @@ _ui_arguments() {
 _privacy_actions() {
   local -a actions
   actions=(
-    'grant:Grant access without prompting. Requires bundle identifier.'
-    'revoke:Revoke access, denying all use of the service. Requires bundle identifier.'
-    'reset:Reset access, prompting on next use. Bundle identifier optional.'
+    'grant:grant access without prompting (requires bundle identifier)'
+    'revoke:revoke access, denying all use of the service (requires bundle identifier)'
+    'reset:reset access, prompting on next use (bundle identifier optional)'
   )
   _describe action actions
 }
@@ -422,19 +419,19 @@ _privacy_actions() {
 _privacy_services() {
   local -a services
   services=(
-    'all:Apply the action to all services.'
-    'calendar:Allow access to calendar.'
-    'contacts-limited:Allow access to basic contact info.'
-    'contacts:Allow access to full contact details.'
-    'location:Allow access to location services when app is in use.'
-    'location-always:Allow access to location services at all times.'
-    'photos-add:Allow adding photos to the photo library.'
-    'photos:Allow full access to the photo library.'
-    'media-library:Allow access to the media library.'
-    'microphone:Allow access to audio input.'
-    'motion:Allow access to motion and fitness data.'
-    'reminders:Allow access to reminders.'
-    'siri:Allow use of the app with Siri.'
+    'all:apply the action to all services'
+    'calendar:allow access to calendar'
+    'contacts-limited:allow access to basic contact info'
+    'contacts:allow access to full contact details'
+    'location:allow access to location services when app is in use'
+    'location-always:allow access to location services at all times'
+    'photos-add:allow adding photos to the photo library'
+    'photos:allow full access to the photo library'
+    'media-library:allow access to the media library'
+    'microphone:allow access to audio input'
+    'motion:allow access to motion and fitness data'
+    'reminders:allow access to reminders'
+    'siri:allow use of the app with Siri'
   )
   _describe service services
 }
@@ -448,9 +445,9 @@ _keychain() {
 _keychain_actions() {
   local -a actions
   actions=(
-    'add-root-cert:Add a certificate to the trusted root store.'
-    'add-cert:Add a certificate to the keychain.'
-    'reset:Reset the keychain.'
+    'add-root-cert:add a certificate to the trusted root store'
+    'add-cert:add a certificate to the keychain'
+    'reset:reset the keychain'
   )
   _describe action actions
 }
@@ -520,7 +517,7 @@ _devices() {
 _devices_all() {
   local -a devices
   devices=(
-    all:'All devices'
+    all:'all devices'
   )
   _describe -V device devices
 }
@@ -528,7 +525,7 @@ _devices_all() {
 _devices_unavailable() {
   local -a devices
   devices=(
-    unavailable:'Devices not supported by the current Xcode SDK'
+    unavailable:'devices not supported by the current Xcode SDK'
   )
   _describe -V device devices
 }
