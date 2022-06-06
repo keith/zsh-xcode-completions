@@ -69,3 +69,5 @@ simctl:
 	-xcrun simctl help logverbose
 	@echo
 	-xcrun simctl help status_bar
+	@echo
+	-xcrun simctl help ui

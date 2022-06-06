@@ -42,6 +42,7 @@ _commands() {
     'diagnose:Collect diagnostic information and logs.'
     'logverbose:enable or disable verbose logging for a device'
     'status_bar:Set or clear status bar overrides'
+    'ui:Get or Set UI options'
   )
   _describe subcommand commands
 }
@@ -243,6 +244,12 @@ _options() {
         '*:: :_status_bar'
       ;;
 
+    (ui)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        '*:: :_ui'
+      ;;
+
   esac
 }
 
@@ -340,6 +347,33 @@ _status_bar_arguments() {
         '--operatorName=:name:' \
         '--batteryState=:state:(charging charged discharging)' \
         '--batteryLevel=:percent:'
+      ;;
+
+  esac
+}
+
+_ui() {
+  _arguments \
+    ':option:(appearance increase_contrast content_size)' \
+    '*:: :_ui_arguments'
+}
+
+_ui_arguments() {
+  case $line[1] in
+
+    (appearance)
+      _arguments \
+        '::mode:(light dark)'
+      ;;
+
+    (increase_contrast)
+      _arguments \
+        '::status:(enabled disabled)'
+      ;;
+
+    (content_size)
+      _arguments \
+        '::content size category:(increment decrement extra-small small medium large extra-large extra-extra-large extra-extra-extra-large accessibility-medium accessibility-large accessibility-extra-large accessibility-extra-extra-large accessibility-extra-extra-extra-large)'
       ;;
 
   esac

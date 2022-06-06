@@ -336,3 +336,47 @@ Supported Operations:
 	     If specified must be 0-100.
 
 
+
+xcrun simctl help ui
+Get or Set UI options
+Usage: simctl ui <device> <option> [<arguments>]
+
+Supported Options:
+    appearance
+	When invoked without arguments prints the current user interface appearance style:
+	     light
+	     The Light appearance style.
+	     dark
+	     The Dark appearance style.
+	     unsupported
+	     The platform or runtime version do not support appearance styles.
+	     unknown
+	     The current style is unknown or there was an error detecting it.
+
+    appearance [light | dark]
+	Set the user interface apperance style to light or dark.
+
+    increase_contrast
+	When invoked without arguments prints whether the Increase Contrast mode is currently enabled:
+	     enabled
+	     Increase Contrast is enabled.
+	     disabled
+	     Increase Contrast is disabled.
+	     unsupported
+	     The platform or runtime version do not support the Increase Contrast setting.
+	     unknown
+	     The current setting is unknown or there was an error detecting it.
+
+    increase_contrast [enabled | disabled]
+	Enable or disable Increase Contrast mode.
+
+    content_size
+	When invoked without arguments prints the current preferred content size category, from the following possible values:
+	     Standard sizes: extra-small, small, medium, large, extra-large, extra-extra-large, extra-extra-extra-large.
+	     Extended range sizes: accessibility-medium, accessibility-large, accessibility-extra-large, accessibility-extra-extra-large, accessibility-extra-extra-extra-large.
+	     Other values: unknown, unsupported.
+
+    content_size [increment | decrement | desired_size]
+	Set the preferred content size category. If 'increment' or 'decrement' is passed, the preferred content size will beset to the category one increment larger or smaller than the currently set value respectively.
+
+
