@@ -71,3 +71,5 @@ simctl:
 	-xcrun simctl help status_bar
 	@echo
 	-xcrun simctl help ui
+	@echo
+	-xcrun simctl help push

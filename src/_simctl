@@ -43,6 +43,7 @@ _commands() {
     'logverbose:enable or disable verbose logging for a device'
     'status_bar:Set or clear status bar overrides'
     'ui:Get or Set UI options'
+    'push:Send a simulated push notification'
   )
   _describe subcommand commands
 }
@@ -248,6 +249,13 @@ _options() {
       _arguments \
         ':device:{FILTER=booted _devices}' \
         '*:: :_ui'
+      ;;
+
+    (push)
+      _arguments \
+        ':device:{FILTER=booted _devices}' \
+        '::bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
+        ':json file or -:_files -g \*.json'
       ;;
 
   esac
