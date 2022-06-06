@@ -1,6 +1,5 @@
 #compdef simctl
 
-# TODO: remove unneeded inline descriptions
 # TODO: understand groups, split on groups
 # TODO: too aggressive booted filtering?
 # TODO: use booted device?
@@ -23,7 +22,7 @@ _commands() {
     'delete:Delete specified devices, unavailable devices, or all devices.'
     'pair:Create a new watch and phone pair.'
     'unpair:Unpair a watch and phone pair.'
-    'pair_activate:Unpair a watch and phone pair.'
+    'pair_activate:Set a given pair as active.'
     'erase:Erase a device'"'"'s contents and settings.'
     'boot:Boot a device or device pair.'
     'shutdown:Shutdown a device.'
@@ -63,21 +62,21 @@ _options() {
     (create)
       _arguments \
         ':name:' \
-        ':device type id:_devicetypes' \
-        '::runtime id:{DEVICETYPE=${(Q)words[CURRENT-1]} _runtimes}'
+        ': :_devicetypes' \
+        ':: :{DEVICETYPE=${(Q)words[CURRENT-1]} _runtimes}'
       ;;
 
     (clone)
       _arguments \
-        ':device:{FILTER=available_shutdown _devices}' \
+        ': :{FILTER=available_shutdown _devices}' \
         ':name:' \
         '::destination device set:_files -/'
       ;;
 
     (upgrade)
       _arguments \
-        ':device:{FILTER=shutdown _devices}' \
-        ':runtime id:{DEVICE=${(Q)words[CURRENT-1]} _runtimes}'
+        ': :{FILTER=shutdown _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _runtimes}'
       ;;
 
     (delete)
@@ -87,13 +86,13 @@ _options() {
 
     (pair)
       _arguments \
-        ':device:{FILTER=watches _devices}' \
-        ':device:{FILTER=phones _devices}'
+        ': :{FILTER=watches _devices}' \
+        ': :{FILTER=phones _devices}'
       ;;
 
     (unpair|pair_activate)
       _arguments \
-        ':pair:_pairs'
+        ': :_pairs'
       ;;
 
     (erase)
@@ -115,50 +114,50 @@ _options() {
 
     (rename)
       _arguments \
-        ':device:_devices' \
+        ': :_devices' \
         ':name:'
       ;;
 
     (getenv)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}' \
         ':variable name:'
       ;;
 
     (openurl)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
-        ':url:{DEVICE=${(Q)words[CURRENT-1]} _urls}'
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _urls}'
       ;;
 
     (addmedia)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}' \
         '*:path:_files'
       ;;
 
     (install)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}' \
         ':path:_files -/'
       ;;
 
     (uninstall)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} APPLICATION_TYPE=User _bundle_identifiers}'
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} APPLICATION_TYPE=User _bundle_identifiers}'
       ;;
 
     (get_app_container)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
-        ':container:{DEVICE=${(Q)words[CURRENT-2]} BUNDLE_IDENTIFIER=${(Q)words[CURRENT-1]} _containers}'
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
+        ': :{DEVICE=${(Q)words[CURRENT-2]} BUNDLE_IDENTIFIER=${(Q)words[CURRENT-1]} _containers}'
       ;;
 
     (install_app_data)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}' \
         ':path:_files -g \*.xcappdata'
       ;;
 
@@ -170,15 +169,15 @@ _options() {
         '(--console --console-pty)--stdout=-[Redirect the application'"'"'s standard output to a file.]: :_files' \
         '(--console --console-pty)--stderr=-[Redirect the application'"'"'s standard error to a file.]: :_files' \
         '--terminate-running-process[Terminate any running copy of the application.]' \
-        '(-):device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
+        '(-): :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
         '*::argv:'
       ;;
 
     (terminate)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
-        ':app bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}'
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}'
       ;;
 
     (spawn)
@@ -187,7 +186,7 @@ _options() {
         '(-s --standalone)'{-s,--standalone} \
         '(--arch)-a:arch:' \
         '(-a)--arch=-:arch:' \
-        '(-):device:{FILTER=booted _devices}' \
+        '(-): :{FILTER=booted _devices}' \
         ':path:_files' \
         '*::argv:'
       ;;
@@ -202,21 +201,21 @@ _options() {
 
     (icloud_sync|listapps)
       _arguments \
-        ':device:{FILTER=booted _devices}'
+        ': :{FILTER=booted _devices}'
       ;;
 
     (pbsync)
       _arguments \
         '-p[causes simctl to use promise data for secondary types]' \
         '-v' \
-        ':source device:{_host; FILTER=booted _devices}' \
-        ':destination device:{_host; FILTER=booted _devices}'
+        ': :{_host; FILTER=booted _devices}' \
+        ': :{_host; FILTER=booted _devices}'
       ;;
 
     (pbcopy|pbpaste)
       _arguments \
         '-v' \
-        ':device:{FILTER=booted _devices}'
+        ': :{FILTER=booted _devices}'
       ;;
 
     (help)
@@ -226,7 +225,7 @@ _options() {
 
     (io)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}' \
         '*:: :_io'
       ;;
 
@@ -244,40 +243,40 @@ _options() {
 
     (logverbose)
       _arguments \
-        '::device:{FILTER=booted _devices}' \
+        ':: :{FILTER=booted _devices}' \
         ':state:(enable disable)'
       ;;
 
     (status_bar)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}' \
         '*:: :_status_bar'
       ;;
 
     (ui)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}' \
         '*:: :_ui'
       ;;
 
     (push)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
-        '::bundle identifier:{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
+        ': :{FILTER=booted _devices}' \
+        ':: :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
         ':json file or -:_files -g \*.json'
       ;;
 
     (privacy)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
-        ':action:_privacy_actions' \
-        ':service:_privacy_services' \
-        '::bundle identifier:{DEVICE=${(Q)words[CURRENT-3]} _bundle_identifiers}'
+        ': :{FILTER=booted _devices}' \
+        ': :_privacy_actions' \
+        ': :_privacy_services' \
+        ':: :{DEVICE=${(Q)words[CURRENT-3]} _bundle_identifiers}'
       ;;
 
     (keychain)
       _arguments \
-        ':device:{FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}' \
         '*:: :_keychain'
       ;;
 
@@ -286,8 +285,8 @@ _options() {
 
 _io() {
   _arguments \
-    ':operation:_io_operations' \
-    '*::arguments:_io_op_arguments'
+    ': :_io_operations' \
+    '*:: :_io_op_arguments'
 }
 
 _io_operations() {
@@ -350,8 +349,8 @@ _io_screenshot_masks() {
 
 _status_bar() {
   _arguments \
-    ':operation:_status_bar_operations' \
-    '*::arguments:_status_bar_arguments'
+    ': :_status_bar_operations' \
+    '*:: :_status_bar_arguments'
 }
 
 _status_bar_operations() {
@@ -442,7 +441,7 @@ _privacy_services() {
 
 _keychain() {
   _arguments \
-    ':option:_keychain_actions' \
+    ': :_keychain_actions' \
     '*:: :_keychain_arguments'
 }
 
@@ -470,7 +469,7 @@ _keychain_arguments() {
 _devicetypes() {
   local -a devicetypes
   devicetypes=(${(f)"$(xcrun simctl list devicetypes -j | jq -r '.devicetypes[].name')"})
-  _describe devicetype devicetypes
+  _describe 'device type' devicetypes
 }
 
 _runtimes() {
