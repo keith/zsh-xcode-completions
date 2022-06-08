@@ -235,7 +235,10 @@ _options() {
 	'--no-archive[do not create an archive, leave the collected files uncompressed]' \
 	'--all-logs[include all device logs, even for non-booted devices]' \
 	'--data-containers[include booted device(s) data directory]' \
-	'--udid=-[collect diagnostics only from the specified device]:device:_devices'
+	'--udid=-[collect diagnostics only from the specified device]:device:_devices' \
+        '--create-radar[\[INTERNAL\] create a new radar with the output attached]' \
+        '--radar-component=-[\[INTERNAL\] use this radar component number when --create-radar is provided]' \
+        '--create-smart-radars[\[INTERNAL\] try to discover problems in running Simulators and create radars for them]'
       ;;
 
     (logverbose)
