@@ -451,6 +451,224 @@ Usage: simctl keychain <device> <action> [arguments]
 
 
 
+xcrun simctl help addphoto
+Add photos to the photo library of a device.
+Usage: simctl addphoto <device> <path> [... <path>]
+
+xcrun simctl help addvideo
+Add videos to the photo library of a device.
+Usage: simctl addvideo <device> <path> [... <path>]
+
+xcrun simctl help pbinfo
+Print information about the device's pasteboard
+Usage: simctl pbinfo <device or "host">
+
+xcrun simctl help notify_post
+Post a darwin notification on a device.
+Usage: simctl notify_post <device> <notification name>
+
+xcrun simctl help notify_get_state
+Get the state value of a darwin notification on a device.
+Usage: simctl notify_get_state <device> <notification name>
+
+xcrun simctl help notify_set_state
+Set the state value of a darwin notification on a device.
+Usage: simctl notify_set_state <device> <notification name> <state>
+
+xcrun simctl help register
+Register a service from one bootstrap into another.
+Usage: simctl register <source device or "host">/<service> <destination device>/<service>
+
+xcrun simctl help unregister
+Unregister a service from a device's bootstrap.
+Usage: simctl unregister <device> <service>
+
+xcrun simctl help keyboard
+Set the device's keyboard language.
+Usage: simctl keyboard <device> <language>
+
+xcrun simctl help monitor
+List notifications as they arrive.
+Usage: simctl monitor 
+
+xcrun simctl help appinfo
+Show information about an installed application.
+Usage: simctl appinfo <device> <bundle identifier>
+
 xcrun simctl help listapps
 Show the installed applications.
 Usage: simctl listapps <device>
+
+xcrun simctl help bootstatus
+Checks device boot status.
+Usage: simctl bootstatus <device> [-bcd]
+	-b       Boot the device if it isn't already booted.
+	-d       Print data migration information, if it's available.
+	-c       Continuously monitor boot status through multiple boot/shutdown cycles.
+
+Monitors the specified device and prints boot status information until the device finishes booting. You can safely call this before you attempt to start booting the device.
+
+
+xcrun simctl help darwinup
+Invoke darwinup to install a root for the specified simulator runtime.
+Usage: simctl darwinup [-fnsv] <platform> <command> [<archive> ...]
+
+options:
+	-f         Force operation to succeed at all costs.
+	-n         Dry run; prints arguments that would have been sent to darwinup.
+	-s         Use the SDK root path instead of the runtime root.
+	-v         More verbose output.
+
+<platform> is the Simulator platform, i.e. iphonesimulator, watchsimulator, appletvsimulator.
+(To target a runtime disk image, specify the path to that runtime instead. Invalid with -s).
+
+commands:
+	install    Install the roots specified by one or more <archive> arguments.
+	list       List the installed roots, with optional filter using <archive> arguments.
+	uninstall  Remove the roots specified by one or more <archive> arguments.
+
+	See darwinup usage for additional commands and more information.
+
+NOTE: If you install or uninstall roots, you must manually update the dyld_sim shared cache.
+      See simctl help runtime for information about triggering a dyld_sim shared cache rebuild.
+
+
+xcrun simctl help disk
+Perform disk operations, like simulating volume unmount.
+Usage: simctl disk <operation> <arguments>
+
+Supported Operations:
+	mount <path>
+	     Simulate mounting the given path. This will look for runtime profiles in a mountable disk image.
+	     The path will automatically be truncated to the root of the volume that contains it.
+	     As a special exception, if the path contains 'Xcode{-beta}.app it will also register that Xcode's developer
+	     directory with CoreSimulator as if a client had done so.
+	unmount <path>
+	     Simulate unmounting the given path. This can  be a mountable disk image path or volume containing Xcode.
+	     The path will automatically be truncated to the root of the volume that contains it.
+	     Any booted simulators using profiles on this volume will be shutdown. Any profiles on this volume will
+	     become unavailable.
+Note: The path you pass must be to an unmountable volume. Passing '/' is not supported.
+
+
+xcrun simctl help runtime
+Locate, copy, mount, and unmount simulator runtime disk images.
+Usage: simctl runtime <operation> <arguments>
+
+Supported Operations:
+    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--max-cache-size <size>] [--cache-path <path>] [--mountpoint <mount location>]
+	Locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator.
+
+	--internal
+	     (Default) Select the internal runtime.
+	--customer
+	     Select the customer (public) runtime.
+	--shadow <path>
+	     Manually specify a different shadow image. The same base image can be mounted multiple
+	     times with different shadow files so modifications to one mount path are not visible to others.
+	--no-sparse
+	     By default images are converted to a sparse image, then the partition size is set to 100GB.
+	     This leaves plenty of room to install roots without wasting space (sparse images grow as needed).
+	     This flag disables this behavior: the image will have the original format and partition size.
+	     NOTE: You don't want this.
+	--writable
+	     When mounting the disk image, do not use a shadow file: directly mount the image as writable.
+	     NOTE: You don't want this.
+	--use-nfs
+	     By default images are downloaded from NFA. If this is passed in, the image is copied from NFS instead. Note that newer images (as of SkyB) are no longer available via NFS.
+	--no-mount
+	     Copy the image to the cache (if not present), but do not actually mount it. Prints the path of the image as the last line of output.
+	--print-only
+	     Print the path to the image on the network but take no other action.
+
+
+    unmount <train-build> [--force]
+	Unmount the Simulator Runtime if it is mounted. Any booted simulators will be shut down first.
+	The alias 'all' will unmount all runtime disk images known to CoreSimulator.
+
+	--force
+	     Force-unmount even if the disk is busy.
+
+
+    cache [list | clear [--dry-run]] [--cache-path <path>]
+	list
+	     Lists cached runtime disk images
+
+	clear
+	     Deletes all simulator runtime disk images (excludes runtimes bundled with Xcode or downloaded runtimes in /Library).
+	     Any mounted runtimes are unmounted before deletion.
+
+	--dry-run
+	     Run the clear command but print what would have been deleted, without actually deleting anything.
+
+
+    pin <device> [--latest | --build <train-version> | --path <path to runtime>]
+	Pin a device to use a specific runtime.
+
+	--latest
+	     (Default) Use the latest build of the major.minor.revision runtime.
+	--build <train-version>
+	     Pin the device to use a specific build of the runtime. If multiple runtimes match one is randomly chosen.
+	--path <path to runtime>
+	     Pin the device to use a specific runtime by path.
+
+
+    info [path] [<platform> | <train-build>]
+	path
+	     Lists the path to the runtime (the path may contain spaces!)
+	     If no platform or train-build is specified then the iOS runtime bundled with the selected Xcode is chosen.
+	     Platform may be iOS, tvOS, or watchOS to select the relevant Xcode-bundled runtime.
+
+
+    update_dyld_shared_cache (<platform> | <train-build>)
+	Update the dyld shared cache for a specific runtime.
+
+
+    remove_dyld_shared_cache (<platform> | <train-build>)
+	Removes the dyld shared cache for a specific runtime.
+
+	platform | train-build
+	     Platform may be iOS, tvOS, or watchOS to select the relevant Xcode-bundled runtime.
+	     Otherwise the value is assumed to be a train-build and the relevant mounted disk image is used.
+	     If using manually-mounted images or multiple mount points, pass the path to the mountpoint.
+
+	     The dyld_sim shared caches are stored in ~/Library/Developer/CoreSimulator/Caches.
+	     The cache is tied to the specific build of the runtime and the host macOS.
+	     If you upgrade macOS, the caches will be re-built automatically by CoreSimulator in the background
+	     at low priority. In all cases, caches for a macOS that isn't the current macOS will be automatically scheduled for deletion.
+
+
+A <train-version> means a train name (case-sensitive) and build number, such as 'Example10A101'. The only supported alias is 'Current', eg 'CurrentExample'.
+
+Unless a simulated device specifies an explicit build, it will boot with the newest build of the given platform and matching major.minor.revision.
+For example if a device was created with iOS 12.0, it will prefer the newest build of iOS 12.0 it can find. You can have as many builds of iOS 12 mounted
+as you like, but only devices pinned to a runtime will use any other build besides the latest. To change an existing device's pinning
+use pin (see above).
+To create a device pre-pinned to a runtime specify the runtime as a path to the mounted volume rather than an identifier, eg:
+  simctl create <name> <devicetype> /Volumes/Example10A101
+Other commands that take a runtime identifier (such as simctl darwinup) also accept a <train-version> or path to the disk image mount point, so long as you specify
+enough information to uniquely identify a single runtime. If the specifier is ambiguous simctl will error rather than making any assumptions.
+
+By default up to 50 GB of runtime images are cached locally for greatly improved performance. Old images are deleted when the cache grows too large.
+The cache-path and max-cache-size default values can be modified by setting user defaults:
+  defaults write com.apple.CoreSimulator RuntimeImageCachePath '<path>'
+  defaults write com.apple.CoreSimulator RuntimeImageCacheMaxSizeGB 10
+All commands accept --cache-path <path> to override the user default.
+Only the mount command automatically prunes the cache and it accepts --max-cache-size <size in GB> to override the user default.
+
+The default paths searched on the network can be changed or expanded. This should be to the Images subdirectory:
+  defaults write com.apple.CoreSimulator RuntimeImageSearchPaths -array-add '/MountPoint/Team/Images'
+
+CoreSimulator monitors for disk mount and unmount notifications, so you can manually locate the image and mount it if simctl does not meet your needs, eg:
+  hdiutil attach <image> -mountpoint /Volumes/Example10A101 -shadow
+  hdiutil detach /Volumes/Example10A101
+
+
+
+xcrun simctl help reset
+Reset a given archive or database.
+Usage: simctl reset <device> <subsystem>
+
+Supported Subsystems:
+launch_services
+
