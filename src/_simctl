@@ -1,7 +1,5 @@
 #compdef simctl
 
-# TODO: understand groups, split on groups
-
 _simctl() {
   _arguments \
     '--set: :_files -/' \
