@@ -48,7 +48,23 @@ _commands() {
     'push:send a simulated push notification'
     'privacy:grant, revoke, or reset privacy and permissions'
     'keychain:manipulate a device'"'"'s keychain'
+    'addphoto:Add photos to the photo library of a device.'
+    'addvideo:Add videos to the photo library of a device.'
+    'pbinfo:Print information about the device'"'"'s pasteboard'
+    'notify_post:Post a darwin notification on a device.'
+    'notify_get_state:Get the state value of a darwin notification on a device.'
+    'notify_set_state:Set the state value of a darwin notification on a device.'
+    'register:Register a service from one bootstrap into another.'
+    'unregister:Unregister a service from a device'"'"'s bootstrap.'
+    'keyboard:Set the device'"'"'s keyboard language.'
+    'monitor:List notifications as they arrive.'
+    'appinfo:Show information about an installed application.'
     'listapps:show the installed applications'
+    'bootstatus:Checks device boot status.'
+    'darwinup:Invoke darwinup to install a root for the specified simulator runtime.'
+    'disk:Perform disk operations, like simulating volume unmount.'
+    'runtime:Locate, copy, mount, and unmount simulator runtime disk images.'
+    'reset:reset a given archive or database'
   )
   _describe subcommand commands
 }
@@ -127,7 +143,7 @@ _options() {
         ': :{DEVICE=${(Q)words[CURRENT-1]} _urls}'
       ;;
 
-    (addmedia)
+    (addmedia|addphoto|addvideo)
       _arguments \
         ': :{FILTER=booted _devices}' \
         '*:path:_files'
@@ -278,6 +294,84 @@ _options() {
       _arguments \
         ': :{FILTER=booted _devices}' \
         '*:: :_keychain'
+      ;;
+
+    (pbinfo)
+      _arguments \
+        ': :{_host; FILTER=booted _devices}'
+      ;;
+
+    (notify_post|notify_get_state)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':name:'
+      ;;
+
+    (notify_set_state)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':name:' \
+        ':state:'
+      ;;
+
+    (register)
+      _arguments \
+        ': :{_host; FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}'
+      ;;
+
+    (unregister)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':service:'
+      ;;
+
+    (keyboard)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':language:'
+      ;;
+
+    (appinfo)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}'
+      ;;
+
+    (bootstatus)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+	'-b[boot the device if it isn'"'"'t already booted]' \
+	'-d[print data migration information, if it'"'"'s available]' \
+	'-c[continuously monitor boot status through multiple boot/shutdown cycles]'
+      ;;
+
+    (darwinup)
+      _arguments \
+	'-f[force operation to succeed at all costs]' \
+	'-n[dry run; prints arguments that would have been sent to darwinup]' \
+	'-s[use the SDK root path instead of the runtime root]' \
+	'-v[more verbose output]' \
+        ':platform:(iphonesimulator watchsimulator appletvsimulator)' \
+        ':command:(install list uninstall)'
+      ;;
+
+    (disk)
+      _arguments \
+        ':operation:(mount unmount)' \
+        ':path:_files'
+      ;;
+
+    (runtime)
+      _arguments \
+        ': :_runtime_operations' \
+        '*:: :_runtime_arguments'
+      ;;
+
+    (reset)
+      _arguments \
+        ': :_devices' \
+        ':subsystem:(launch_services)'
       ;;
 
   esac
@@ -461,6 +555,117 @@ _keychain_arguments() {
     (add-root-cert|add-cert)
       _arguments \
         ':path:_files -g \*.cer -g \*.pem'
+      ;;
+
+  esac
+}
+
+_runtime_operations() {
+  local -a operations
+  operations=(
+    'mount:locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator'
+    'unmount:Unmount the Simulator Runtime if it is mounted'
+    'cache'
+    'pin:pin a device to use a specific runtime'
+    'info'
+    'update_dyld_shared_cache:update the dyld shared cache for a specific runtime'
+    'remove_dyld_shared_cache:removes the dyld shared cache for a specific runtime'
+  )
+  _describe operation operations
+}
+
+_runtime_arguments() {
+  case $line[1] in
+
+    (mount)
+      _arguments \
+        ':train-build:_files' \
+        '--shadow[manually specify a different shadow image]:path:_files' \
+        '(--customer)--internal[(default) select the internal runtime]' \
+        '(--internal)--customer[select the customer (public) runtime]' \
+        '--writable[when mounting the disk image, do not use a shadow file: directly mount the image as writable]'  \
+        '--no-mount[copy the image to the cache (if not present), but do not actually mount it]' \
+        '--no-copy' \
+        '--print-only[print the path to the image on the network but take no other action]' \
+        '--max-cache-size:size:' \
+        '--cache-path:path:_files' \
+        '--mountpoint:mount location:_files' \
+        '--no-sparse' \
+        '--use-nfs'
+      ;;
+
+    (unmount)
+      _arguments \
+        ':train-build:{_files}' \
+        '--force[force-unmount even if the disk is busy]'
+      ;;
+
+    (cache)
+      _arguments \
+        ': :_runtime_cache_commands' \
+        '*:: :_runtime_cache_arguments' \
+        '--cache_path:path:_files'
+      ;;
+
+    (pin)
+      _arguments \
+        ': :_devices' \
+        '(--build --path)--latest[(default) use the latest build of the major.minor.revision runtime]' \
+        '(--latest --path)--build[pin the device to use a specific build of the runtime]:train-version:' \
+        '(--latest --build)--path[pin the device to use a specific runtime by path]:path to runtime:_files'
+      ;;
+
+    (info)
+      _arguments \
+        ': :_runtime_info_commands' \
+        '*:: :_runtime_info_arguments'
+      ;;
+
+    (update_dyld_shared_cache|remove_dyld_shared_cache)
+      _arguments \
+        '::platform or train-build:_files'
+      ;;
+
+  esac
+}
+
+_runtime_cache_commands() {
+  local -a commands
+  commands=(
+    'list:lists cached runtime disk images'
+    'clear:deletes all simulator runtime disk images'
+  )
+  _describe command commands
+}
+
+_runtime_cache_arguments() {
+  case $line[1] in
+
+    (clear)
+      _arguments \
+        '--dry-run[run the clear command but print what would have been deleted, without actually deleting anything]'
+      ;;
+
+  esac
+
+  _arguments \
+    '--cache-path:path:_files'
+}
+
+_runtime_info_commands() {
+  local -a commands
+  commands=(
+    'path:lists the path to the runtime'
+  )
+  _describe command commands
+}
+
+_runtime_info_arguments() {
+  case $line[1] in
+
+    (path)
+      _arguments \
+        '::platform or train-build:(iOS tvOS watchOS)'
       ;;
 
   esac
