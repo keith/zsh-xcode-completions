@@ -1,0 +1,674 @@
+xcrun simctl || true
+usage: simctl [--set <path>] [--profiles <path>] <subcommand> ...
+       simctl help [subcommand]
+Command line utility to control the Simulator
+
+For subcommands that require a <device> argument, you may specify a device UDID
+or the special "booted" string which will cause simctl to pick a booted device.
+If multiple devices are booted when the "booted" device is selected, simctl
+will choose one of them.
+
+Subcommands:
+	create              Create a new device.
+	clone               Clone an existing device.
+	upgrade             Upgrade a device to a newer runtime.
+	delete              Delete specified devices, unavailable devices, or all devices.
+	pair                Create a new watch and phone pair.
+	unpair              Unpair a watch and phone pair.
+	pair_activate       Set a given pair as active.
+	erase               Erase a device's contents and settings.
+	boot                Boot a device or device pair.
+	shutdown            Shutdown a device.
+	rename              Rename a device.
+	getenv              Print an environment variable from a running device.
+	openurl             Open a URL in a device.
+	addmedia            Add photos, live photos, videos, or contacts to the library of a device.
+	install             Install an app on a device.
+	uninstall           Uninstall an app from a device.
+	get_app_container   Print the path of the installed app's container
+	install_app_data    Install an xcappdata package to a device, replacing the current contents of the container.
+	launch              Launch an application by identifier on a device.
+	terminate           Terminate an application by identifier on a device.
+	spawn               Spawn a process by executing a given executable on a device.
+	list                List available devices, device types, runtimes, or device pairs.
+	icloud_sync         Trigger iCloud sync on a device.
+	pbsync              Sync the pasteboard content from one pasteboard to another.
+	pbcopy              Copy standard input onto the device pasteboard.
+	pbpaste             Print the contents of the device's pasteboard to standard output.
+	help                Prints the usage for a given subcommand.
+	io                  Set up a device IO operation.
+	diagnose            Collect diagnostic information and logs.
+	logverbose          enable or disable verbose logging for a device
+	status_bar          Set or clear status bar overrides
+	ui                  Get or Set UI options
+	push                Send a simulated push notification
+	privacy             Grant, revoke, or reset privacy and permissions
+	keychain            Manipulate a device's keychain
+
+xcrun simctl help create
+Create a new device.
+Usage: simctl create <name> <device type id> [<runtime id>]
+
+	<device type id>    A valid available device type. Find these by running "xcrun simctl list devicetypes".
+	                    Examples: ("iPhone X", "com.apple.CoreSimulator.SimDeviceType.iPhone-X")
+	<runtime id>        A valid and available runtime. Find these by running "xcrun simctl list runtimes".
+	                    If no runtime is specified the newest runtime compatible with the device type is chosen.
+	                    Examples: ("watchOS3", "watchOS3.2", "watchOS 3.2", "com.apple.CoreSimulator.SimRuntime.watchOS-3-2",
+	                               "/Volumes/path/to/Runtimes/watchOS 3.2.simruntime")
+
+
+xcrun simctl help clone
+Clone an existing device.
+Usage: simctl clone <device> <new name> [<destination device set>]
+
+xcrun simctl help upgrade
+Upgrade a device to a newer runtime.
+Usage: simctl upgrade <device> <runtime id>
+
+xcrun simctl help delete
+Delete specified devices, unavailable devices, or all devices.
+Usage: simctl delete <device> [... <device n>] | unavailable | all
+
+Specifying unavailable will delete devices that are not supported by the current Xcode SDK.
+
+
+xcrun simctl help pair
+Create a new watch and phone pair.
+Usage: simctl pair <watch device> <phone device>
+
+xcrun simctl help unpair
+Unpair a watch and phone pair.
+Usage: simctl unpair <pair UUID>
+
+xcrun simctl help pair_activate
+Set a given pair as active.
+Usage: simctl pair_activate <pair>
+
+xcrun simctl help erase
+Erase a device's contents and settings.
+Usage: simctl erase <device> [... <device n>] | all
+
+Specifying all will erase all existing devices.
+
+xcrun simctl help boot
+Boot a device or device pair.
+Usage: simctl boot <device> [--disabledJob=<job>] [--enabledJob=<job>]
+
+	--disabledJob=<job>     Disables the given launchd job. Multiple jobs can be disabled by passing multiple flags.
+	--enabledJob=<job>      Enables the given launchd job when it would normally be disabled.
+	                        Multiple jobs can be enabled by passing multiple flags.
+
+
+If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
+
+xcrun simctl help shutdown
+Shutdown a device.
+Usage: simctl shutdown <device> | all
+
+Specifying all will shut down all running devices
+
+xcrun simctl help rename
+Rename a device.
+Usage: simctl rename <device> <name>
+
+xcrun simctl help getenv
+Print an environment variable from a running device.
+Usage: simctl getenv <device> <variable name>
+
+xcrun simctl help openurl
+Open a URL in a device.
+Usage: simctl openurl <device> <URL>
+
+xcrun simctl help addmedia
+Add photos, live photos, videos, or contacts to the library of a device.
+Usage: simctl addmedia <device> <path> [... <path>]
+
+You can specify multiple files including a mix of photos, videos, and contacts.
+
+You can also specify multiple live photos by providing the photo and video files. They will automatically be discovered and imported correctly.
+
+Contacts support the vCard format.
+
+xcrun simctl help install
+Install an app on a device.
+Usage: simctl install <device> <path>
+
+xcrun simctl help uninstall
+Uninstall an app from a device.
+Usage: simctl uninstall <device> <app bundle identifier>
+
+xcrun simctl help get_app_container
+Print the path of the installed app's container
+Usage: simctl get_app_container <device> <app bundle identifier> [<container>]
+
+container   Optionally specify the container. Defaults to app.
+  app                 The .app bundle
+  data                The application's data container
+  groups              The App Group containers
+  <group identifier>  A specific App Group container
+
+
+
+xcrun simctl help install_app_data
+Install an xcappdata package to a device, replacing the current contents of the container.
+Usage: simctl install_app_data <device> <path to xcappdata package>
+	 This will replace the current contents of the container. If the app is currently running it will be terminated before the container is replaced.
+
+xcrun simctl help launch
+Launch an application by identifier on a device.
+Usage: simctl launch [-w | --wait-for-debugger] [--console|--console-pty] [--stdout=<path>] [--stderr=<path>] [--terminate-running-process] <device> <app bundle identifier> [<argv 1> <argv 2> ... <argv n>]
+
+	--console Block and print the application's stdout and stderr to the current terminal.
+		Signals received by simctl are passed through to the application.
+		(Cannot be combined with --stdout or --stderr)
+	--console-pty Block and print the application's stdout and stderr to the current terminal via a PTY.
+		Signals received by simctl are passed through to the application.
+		(Cannot be combined with --stdout or --stderr)
+	--stdout=<path> Redirect the application's standard output to a file.
+	--stderr=<path> Redirect the application's standard error to a file.
+	--terminate-running-process Terminate any running copy of the application.
+		Note: Log output is often directed to stderr, not stdout.
+
+If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
+
+xcrun simctl help terminate
+Terminate an application by identifier on a device.
+Usage: simctl terminate <device> <app bundle identifier>
+
+xcrun simctl help spawn
+Spawn a process by executing a given executable on a device.
+Usage: simctl spawn [-w | --wait-for-debugger] [-s | --standalone] [-a <arch> | --arch=<arch>] <device> <path to executable> [<argv 1> <argv 2> ... <argv n>]
+
+The path to the executable is searched using the following rules:
+   <path> contains no / characters: search the device's $PATH. This is similar to how most shells work, but searches the device's path instead of the host's path.
+   <path> starts with /: Assume a literal path to the binary. This must start from the host's root.
+   <path> contains non-leading / characters: search relative to the current directory first, then relative to the device's $SIMULATOR_ROOT.
+
+If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
+
+xcrun simctl help list
+List available devices, device types, runtimes, or device pairs.
+Usage: simctl list [-j | --json] [-v] [devices|devicetypes|runtimes|pairs] [<search term>|available]
+-j     Print as JSON
+-v     More verbose output
+
+Specify one of 'devices', 'devicetypes', 'runtimes', or 'pairs' to list only items of that type. If a type filter is specified you may also specify a search term. Search terms use a simple case-insensitive contains check against the item's description. You may use the search term 'available' to only list available items.
+
+
+xcrun simctl help icloud_sync
+Trigger iCloud sync on a device.
+Usage: simctl icloud_sync <device>
+
+xcrun simctl help pbsync
+Sync the pasteboard content from one pasteboard to another.
+Usage: simctl pbsync [-pv] <source device or "host"> <destination device or "host">
+
+ -p causes simctl to use promise data for secondary types.  simctl will continue to run to provide that promise data until something else replaces it on the pasteboard.
+
+xcrun simctl help pbcopy
+Copy standard input onto the device pasteboard.
+Usage: simctl pbcopy [-v] <device or "host">
+
+xcrun simctl help pbpaste
+Print the contents of the device's pasteboard to standard output.
+Usage: simctl pbpaste [-v] <device or "host">
+
+xcrun simctl help help
+Prints the usage for a given subcommand.
+Usage: simctl help <subcommand>
+
+xcrun simctl help io
+Set up a device IO operation.
+Usage: simctl io <device> <operation> <arguments>
+
+Supported operations:
+	enumerate [--poll]
+	    Lists all available IO ports and descriptor states.
+	    --poll       Poll after enumeration.
+
+	poll
+	    Polls all available IO ports for events.
+
+	recordVideo [--codec=<codec>] [--display=<display>] [--mask=<policy>] [--force] <file or url>
+	    Records the display to a QuickTime movie at the specified file or url.
+	    --codec      Specifies the codec type: "h264" or "hevc". Default is "hevc".
+
+	    --display    iOS: supports "internal" or "external". Default is "internal".
+	                 tvOS: supports only "external"
+	                 watchOS: supports only "internal"
+
+	    --mask       For non-rectangular displays, handle the mask by policy:
+	                 ignored: The mask is ignored and the unmasked framebuffer is saved.
+	                 alpha: Not supported, but retained for compatibility; the mask is rendered black.
+	                 black: The mask is rendered black.
+
+	    --force      Force the output file to be written to, even if the file already exists.
+
+	screenshot [--type=<type>] [--display=<display>] [--mask=<policy>] <file or url>
+	    Saves a screenshot as a PNG to the specified file or url(use "-" for stdout).
+	    --type       Can be "png", "tiff", "bmp", "gif", "jpeg". Default is png.
+
+	    --display    iOS: supports "internal" or "external". Default is "internal".
+	                 tvOS: supports only "external"
+	                 watchOS: supports only "internal"
+
+	                 You may also specify a port by UUID
+	    --mask       For non-rectangular displays, handle the mask by policy:
+	                 ignored: The mask is ignored and the unmasked framebuffer is saved.
+	                 alpha: The mask is used as premultiplied alpha.
+	                 black: The mask is rendered black.
+
+Example:
+	Save a screenshot of the booted device to screenshot.png:
+	simctl io booted screenshot screenshot.png
+
+
+
+xcrun simctl help diagnose
+Collect diagnostic information and logs.
+Usage: simctl diagnose [-bX] [--timeout=<duration>] [--output=<path>] [--no-archive] [--all-logs] [--data-containers] [--udid=<device> [--udid=<device> [...]]]
+
+	-b                Do NOT show the resulting archive in a Finder window upon completion.
+	-X                Run all diagnostics with no timeout. It ignores the --timeout value if it is specified.
+	--timeout         Specify a duration (in seconds) to wait for the log collection before timeout.
+	--output          Specify the output directory.
+	                  If not provided the temporary directory is used.
+	--no-archive      Do not create an archive, leave the collected files uncompressed.
+	--all-logs        Include all device logs, even for non-booted devices.
+	--data-container  Include booted device(s) data directory.
+	                  Warning: May include private information, app data containers,
+	                  and increases the size of the archive!
+	                  Default is NOT to collect the data container.
+	--udid            Collect diagnostics only from the specified device. This option
+	                  may be specified more than once to consider multiple devices.
+	                  The --all-logs option causes all --udid options to be ignored.
+
+Please provide simctl diagnose output when filing bugs.
+
+NOTE: If there are booted devices only logs from those devices are collected by default, otherwise --all-logs is assumed. More information can be collected from a booted device so you should prefer leaving affected simulators booted when running simctl diagnose. 
+
+NOTE: You can run 'simctl logverbose <device> enable' to enable verbose logging and reboot the device before reproducing the problem and running 'simctl diagnose'.
+
+
+xcrun simctl help logverbose
+enable or disable verbose logging for a device
+Usage: simctl logverbose [<device>] (enable | disable)
+	<device>         The device. If not provided all booted devices are affected.
+	enable           Enables verbose logging
+	disable          Disables verbose logging
+
+NOTE: You may need to reboot the affected device before logging changes will be effective.
+
+
+xcrun simctl help status_bar
+Set or clear status bar overrides
+Usage: simctl status_bar <device> [list | clear | override <override arguments>]
+
+Supported Operations:
+    list
+	List existing overrides.
+
+    clear
+	Clear all existing status bar overrides.
+
+    override <override arguments>
+	Set status bar override values, according to these flags.
+	You may specify any combination of these flags (at least one is required):
+
+	--time <string>
+	     Set the date or time to a fixed value.
+	     If the string is a valid ISO date string it will also set the date on relevant devices.
+	--dataNetwork <dataNetworkType>
+	     If specified must be one of 'hide', 'wifi', '3g', '4g', 'lte', 'lte-a', 'lte+', '5g', '5g+', or '5g-uwb'.
+	--wifiMode <mode>
+	     If specified must be one of 'searching', 'failed', or 'active'.
+	--wifiBars <int>
+	     If specified must be 0-3.
+	--cellularMode <mode>
+	     If specified must be one of 'notSupported', 'searching', 'failed', or 'active'.
+	--cellularBars <int>
+	     If specified must be 0-4.
+	--operatorName <string>
+	     Set the cellular operator/carrier name. Use '' for the empty string.
+	--batteryState <state>
+	     If specified must be one of 'charging', 'charged', or 'discharging'.
+	--batteryLevel <int>
+	     If specified must be 0-100.
+
+
+
+xcrun simctl help ui
+Get or Set UI options
+Usage: simctl ui <device> <option> [<arguments>]
+
+Supported Options:
+    appearance
+	When invoked without arguments prints the current user interface appearance style:
+	     light
+	     The Light appearance style.
+	     dark
+	     The Dark appearance style.
+	     unsupported
+	     The platform or runtime version do not support appearance styles.
+	     unknown
+	     The current style is unknown or there was an error detecting it.
+
+    appearance [light | dark]
+	Set the user interface apperance style to light or dark.
+
+    increase_contrast
+	When invoked without arguments prints whether the Increase Contrast mode is currently enabled:
+	     enabled
+	     Increase Contrast is enabled.
+	     disabled
+	     Increase Contrast is disabled.
+	     unsupported
+	     The platform or runtime version do not support the Increase Contrast setting.
+	     unknown
+	     The current setting is unknown or there was an error detecting it.
+
+    increase_contrast [enabled | disabled]
+	Enable or disable Increase Contrast mode.
+
+    content_size
+	When invoked without arguments prints the current preferred content size category, from the following possible values:
+	     Standard sizes: extra-small, small, medium, large, extra-large, extra-extra-large, extra-extra-extra-large.
+	     Extended range sizes: accessibility-medium, accessibility-large, accessibility-extra-large, accessibility-extra-extra-large, accessibility-extra-extra-extra-large.
+	     Other values: unknown, unsupported.
+
+    content_size [increment | decrement | desired_size]
+	Set the preferred content size category. If 'increment' or 'decrement' is passed, the preferred content size will beset to the category one increment larger or smaller than the currently set value respectively.
+
+
+
+xcrun simctl help push
+Send a simulated push notification
+Usage: simctl push <device> [<bundle identifier>] (<json file> | -)
+
+	bundle identifier
+	     The bundle identifier of the target application
+	     If the payload file contains a 'Simulator Target Bundle' top-level key this parameter may be omitted.
+	     If both are provided this argument will override the value from the payload.
+	json file
+	     Path to a JSON payload or '-' to read from stdin. The payload must:
+	       - Contain an object at the top level.
+	       - Contain an 'aps' key with valid Apple Push Notification values.
+	       - Be 4096 bytes or less.
+
+Only application remote push notifications are supported. VoIP, Complication, File Provider, and other types are not supported.
+
+
+
+xcrun simctl help privacy
+Grant, revoke, or reset privacy and permissions
+Usage: simctl privacy <device> <action> <service> [<bundle identifier>]
+
+	action
+	     The action to take:
+	         grant - Grant access without prompting. Requires bundle identifier.
+	         revoke - Revoke access, denying all use of the service. Requires bundle identifier.
+	         reset - Reset access, prompting on next use. Bundle identifier optional.
+	     Some permission changes will terminate the application if running.
+	service
+	     The service:
+	         all - Apply the action to all services.
+	         calendar - Allow access to calendar.
+	         contacts-limited - Allow access to basic contact info.
+	         contacts - Allow access to full contact details.
+	         location - Allow access to location services when app is in use.
+	         location-always - Allow access to location services at all times.
+	         photos-add - Allow adding photos to the photo library.
+	         photos - Allow full access to the photo library.
+	         media-library - Allow access to the media library.
+	         microphone - Allow access to audio input.
+	         motion - Allow access to motion and fitness data.
+	         reminders - Allow access to reminders.
+	         siri - Allow use of the app with Siri.
+	bundle identifier
+	     The bundle identifier of the target application.
+
+Examples:
+	reset all permissions: privacy <device> reset all
+	grant test host photo permissions: privacy <device> grant photos com.example.app.test-host
+
+Warning:
+Normally applications must have valid Info.plist usage description keys and follow the API guidelines to request access to services. Using this command to bypass those requirements can mask bugs.
+
+
+
+xcrun simctl help keychain
+Manipulate a device's keychain
+Usage: simctl keychain <device> <action> [arguments]
+
+    add-root-cert [path]
+        Add a certificate to the trusted root store.
+
+    add-cert [path]
+        Add a certificate to the keychain.
+
+    reset
+        Reset the keychain.
+
+
+
+xcrun simctl help addphoto
+Add photos to the photo library of a device.
+Usage: simctl addphoto <device> <path> [... <path>]
+
+xcrun simctl help addvideo
+Add videos to the photo library of a device.
+Usage: simctl addvideo <device> <path> [... <path>]
+
+xcrun simctl help pbinfo
+Print information about the device's pasteboard
+Usage: simctl pbinfo <device or "host">
+
+xcrun simctl help notify_post
+Post a darwin notification on a device.
+Usage: simctl notify_post <device> <notification name>
+
+xcrun simctl help notify_get_state
+Get the state value of a darwin notification on a device.
+Usage: simctl notify_get_state <device> <notification name>
+
+xcrun simctl help notify_set_state
+Set the state value of a darwin notification on a device.
+Usage: simctl notify_set_state <device> <notification name> <state>
+
+xcrun simctl help register
+Register a service from one bootstrap into another.
+Usage: simctl register <source device or "host">/<service> <destination device>/<service>
+
+xcrun simctl help unregister
+Unregister a service from a device's bootstrap.
+Usage: simctl unregister <device> <service>
+
+xcrun simctl help keyboard
+Set the device's keyboard language.
+Usage: simctl keyboard <device> <language>
+
+xcrun simctl help monitor
+List notifications as they arrive.
+Usage: simctl monitor 
+
+xcrun simctl help appinfo
+Show information about an installed application.
+Usage: simctl appinfo <device> <bundle identifier>
+
+xcrun simctl help listapps
+Show the installed applications.
+Usage: simctl listapps <device>
+
+xcrun simctl help bootstatus
+Checks device boot status.
+Usage: simctl bootstatus <device> [-bcd]
+	-b       Boot the device if it isn't already booted.
+	-d       Print data migration information, if it's available.
+	-c       Continuously monitor boot status through multiple boot/shutdown cycles.
+
+Monitors the specified device and prints boot status information until the device finishes booting. You can safely call this before you attempt to start booting the device.
+
+
+xcrun simctl help darwinup
+Invoke darwinup to install a root for the specified simulator runtime.
+Usage: simctl darwinup [-fnsv] <platform> <command> [<archive> ...]
+
+options:
+	-f         Force operation to succeed at all costs.
+	-n         Dry run; prints arguments that would have been sent to darwinup.
+	-s         Use the SDK root path instead of the runtime root.
+	-v         More verbose output.
+
+<platform> is the Simulator platform, i.e. iphonesimulator, watchsimulator, appletvsimulator.
+(To target a runtime disk image, specify the path to that runtime instead. Invalid with -s).
+
+commands:
+	install    Install the roots specified by one or more <archive> arguments.
+	list       List the installed roots, with optional filter using <archive> arguments.
+	uninstall  Remove the roots specified by one or more <archive> arguments.
+
+	See darwinup usage for additional commands and more information.
+
+NOTE: If you install or uninstall roots, you must manually update the dyld_sim shared cache.
+      See simctl help runtime for information about triggering a dyld_sim shared cache rebuild.
+
+
+xcrun simctl help disk
+Perform disk operations, like simulating volume unmount.
+Usage: simctl disk <operation> <arguments>
+
+Supported Operations:
+	mount <path>
+	     Simulate mounting the given path. This will look for runtime profiles in a mountable disk image.
+	     The path will automatically be truncated to the root of the volume that contains it.
+	     As a special exception, if the path contains 'Xcode{-beta}.app it will also register that Xcode's developer
+	     directory with CoreSimulator as if a client had done so.
+	unmount <path>
+	     Simulate unmounting the given path. This can  be a mountable disk image path or volume containing Xcode.
+	     The path will automatically be truncated to the root of the volume that contains it.
+	     Any booted simulators using profiles on this volume will be shutdown. Any profiles on this volume will
+	     become unavailable.
+Note: The path you pass must be to an unmountable volume. Passing '/' is not supported.
+
+
+xcrun simctl help runtime
+Locate, copy, mount, and unmount simulator runtime disk images.
+Usage: simctl runtime <operation> <arguments>
+
+Supported Operations:
+    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--max-cache-size <size>] [--cache-path <path>] [--mountpoint <mount location>]
+	Locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator.
+
+	--internal
+	     (Default) Select the internal runtime.
+	--customer
+	     Select the customer (public) runtime.
+	--shadow <path>
+	     Manually specify a different shadow image. The same base image can be mounted multiple
+	     times with different shadow files so modifications to one mount path are not visible to others.
+	--no-sparse
+	     By default images are converted to a sparse image, then the partition size is set to 100GB.
+	     This leaves plenty of room to install roots without wasting space (sparse images grow as needed).
+	     This flag disables this behavior: the image will have the original format and partition size.
+	     NOTE: You don't want this.
+	--writable
+	     When mounting the disk image, do not use a shadow file: directly mount the image as writable.
+	     NOTE: You don't want this.
+	--use-nfs
+	     By default images are downloaded from NFA. If this is passed in, the image is copied from NFS instead. Note that newer images (as of SkyB) are no longer available via NFS.
+	--no-mount
+	     Copy the image to the cache (if not present), but do not actually mount it. Prints the path of the image as the last line of output.
+	--print-only
+	     Print the path to the image on the network but take no other action.
+
+
+    unmount <train-build> [--force]
+	Unmount the Simulator Runtime if it is mounted. Any booted simulators will be shut down first.
+	The alias 'all' will unmount all runtime disk images known to CoreSimulator.
+
+	--force
+	     Force-unmount even if the disk is busy.
+
+
+    cache [list | clear [--dry-run]] [--cache-path <path>]
+	list
+	     Lists cached runtime disk images
+
+	clear
+	     Deletes all simulator runtime disk images (excludes runtimes bundled with Xcode or downloaded runtimes in /Library).
+	     Any mounted runtimes are unmounted before deletion.
+
+	--dry-run
+	     Run the clear command but print what would have been deleted, without actually deleting anything.
+
+
+    pin <device> [--latest | --build <train-version> | --path <path to runtime>]
+	Pin a device to use a specific runtime.
+
+	--latest
+	     (Default) Use the latest build of the major.minor.revision runtime.
+	--build <train-version>
+	     Pin the device to use a specific build of the runtime. If multiple runtimes match one is randomly chosen.
+	--path <path to runtime>
+	     Pin the device to use a specific runtime by path.
+
+
+    info [path] [<platform> | <train-build>]
+	path
+	     Lists the path to the runtime (the path may contain spaces!)
+	     If no platform or train-build is specified then the iOS runtime bundled with the selected Xcode is chosen.
+	     Platform may be iOS, tvOS, or watchOS to select the relevant Xcode-bundled runtime.
+
+
+    update_dyld_shared_cache (<platform> | <train-build>)
+	Update the dyld shared cache for a specific runtime.
+
+
+    remove_dyld_shared_cache (<platform> | <train-build>)
+	Removes the dyld shared cache for a specific runtime.
+
+	platform | train-build
+	     Platform may be iOS, tvOS, or watchOS to select the relevant Xcode-bundled runtime.
+	     Otherwise the value is assumed to be a train-build and the relevant mounted disk image is used.
+	     If using manually-mounted images or multiple mount points, pass the path to the mountpoint.
+
+	     The dyld_sim shared caches are stored in ~/Library/Developer/CoreSimulator/Caches.
+	     The cache is tied to the specific build of the runtime and the host macOS.
+	     If you upgrade macOS, the caches will be re-built automatically by CoreSimulator in the background
+	     at low priority. In all cases, caches for a macOS that isn't the current macOS will be automatically scheduled for deletion.
+
+
+A <train-version> means a train name (case-sensitive) and build number, such as 'Example10A101'. The only supported alias is 'Current', eg 'CurrentExample'.
+
+Unless a simulated device specifies an explicit build, it will boot with the newest build of the given platform and matching major.minor.revision.
+For example if a device was created with iOS 12.0, it will prefer the newest build of iOS 12.0 it can find. You can have as many builds of iOS 12 mounted
+as you like, but only devices pinned to a runtime will use any other build besides the latest. To change an existing device's pinning
+use pin (see above).
+To create a device pre-pinned to a runtime specify the runtime as a path to the mounted volume rather than an identifier, eg:
+  simctl create <name> <devicetype> /Volumes/Example10A101
+Other commands that take a runtime identifier (such as simctl darwinup) also accept a <train-version> or path to the disk image mount point, so long as you specify
+enough information to uniquely identify a single runtime. If the specifier is ambiguous simctl will error rather than making any assumptions.
+
+By default up to 50 GB of runtime images are cached locally for greatly improved performance. Old images are deleted when the cache grows too large.
+The cache-path and max-cache-size default values can be modified by setting user defaults:
+  defaults write com.apple.CoreSimulator RuntimeImageCachePath '<path>'
+  defaults write com.apple.CoreSimulator RuntimeImageCacheMaxSizeGB 10
+All commands accept --cache-path <path> to override the user default.
+Only the mount command automatically prunes the cache and it accepts --max-cache-size <size in GB> to override the user default.
+
+The default paths searched on the network can be changed or expanded. This should be to the Images subdirectory:
+  defaults write com.apple.CoreSimulator RuntimeImageSearchPaths -array-add '/MountPoint/Team/Images'
+
+CoreSimulator monitors for disk mount and unmount notifications, so you can manually locate the image and mount it if simctl does not meet your needs, eg:
+  hdiutil attach <image> -mountpoint /Volumes/Example10A101 -shadow
+  hdiutil detach /Volumes/Example10A101
+
+
+
+xcrun simctl help reset
+Reset a given archive or database.
+Usage: simctl reset <device> <subsystem>
+
+Supported Subsystems:
+launch_services
+

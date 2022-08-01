@@ -14,7 +14,8 @@ _arguments \
   '(-n --no-cache)'{-n,--no-cache}'[Do not use lookup cache]' \
   '(-r --run)'{-r,--run}'[Execute tool (default)]' \
   '(-v --verbose)'{-v,--verbose}'[Show verbose output]' \
-  '*: :->executables' \
+  '(-)1: :->executables' \
+  '*:: : _normal' \
   '--sdk[Specify SDK]:SDKs:->sdks' \
   '--show-sdk-path[Show selected SDK path]' \
   '--show-sdk-platform-path[Show selected SDK platform path]' \
@@ -25,10 +26,7 @@ _arguments \
 
 case "$state" in
   executables)
-    executables=($(ls $(dirname $(xcrun -f swift))))
-    if [[ $executables != "" ]]; then
-      _values "Executables" $executables
-    fi
+    PATH="$(dirname "$(xcrun -f swift)")":"$(dirname "$(xcrun -f simctl)")" _command_names -e
     ;;
   sdks)
     if ([[ ${+installed_sdks_platforms} -eq 0 ]] || _cache_invalid SDK_PLATFORMS) && ! _retrieve_cache SDK_PLATFORMS; then

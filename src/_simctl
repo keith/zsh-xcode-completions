@@ -1,0 +1,793 @@
+#compdef simctl
+
+_simctl() {
+  _arguments \
+    '--set: :_files -/' \
+    '--profiles: :_files -/' \
+    ': :_commands' \
+    '*:: :_options'
+}
+
+_commands() {
+  local -a commands
+  commands=(
+    'create:create a new device'
+    'clone:clone an existing device'
+    'upgrade:upgrade a device to a newer runtime'
+    'delete:delete specified devices, unavailable devices, or all devices'
+    'pair:create a new watch and phone pair'
+    'unpair:unpair a watch and phone pair'
+    'pair_activate:set a given pair as active'
+    'erase:erase a device'"'"'s contents and settings'
+    'boot:boot a device or device pair'
+    'shutdown:shutdown a device'
+    'rename:rename a device'
+    'getenv:print an environment variable from a running device'
+    'openurl:open a URL in a device'
+    'addmedia:add photos, live photos, videos, or contacts to the library of a device'
+    'install:install an app on a device'
+    'uninstall:uninstall an app from a device'
+    'get_app_container:print the path of the installed app'"'"'s container'
+    'install_app_data:install an xcappdata package to a device, replacing the current contents of the container'
+    'launch:launch an application by identifier on a device'
+    'terminate:terminate an application by identifier on a device'
+    'spawn:spawn a process by executing a given executable on a device'
+    'list:list available devices, device types, runtimes, or device pairs'
+    'icloud_sync:trigger iCloud sync on a device'
+    'pbsync:sync the pasteboard content from one pasteboard to another'
+    'pbcopy:copy standard input onto the device pasteboard'
+    'pbpaste:print the contents of the device'"'"'s pasteboard to standard output'
+    'help:prints the usage for a given subcommand'
+    'io:set up a device IO operation'
+    'diagnose:collect diagnostic information and logs'
+    'logverbose:enable or disable verbose logging for a device'
+    'status_bar:set or clear status bar overrides'
+    'ui:get or set UI options'
+    'push:send a simulated push notification'
+    'privacy:grant, revoke, or reset privacy and permissions'
+    'keychain:manipulate a device'"'"'s keychain'
+    'addphoto:Add photos to the photo library of a device.'
+    'addvideo:Add videos to the photo library of a device.'
+    'pbinfo:Print information about the device'"'"'s pasteboard'
+    'notify_post:Post a darwin notification on a device.'
+    'notify_get_state:Get the state value of a darwin notification on a device.'
+    'notify_set_state:Set the state value of a darwin notification on a device.'
+    'register:Register a service from one bootstrap into another.'
+    'unregister:Unregister a service from a device'"'"'s bootstrap.'
+    'keyboard:Set the device'"'"'s keyboard language.'
+    'monitor:List notifications as they arrive.'
+    'appinfo:Show information about an installed application.'
+    'listapps:show the installed applications'
+    'bootstatus:Checks device boot status.'
+    'darwinup:Invoke darwinup to install a root for the specified simulator runtime.'
+    'disk:Perform disk operations, like simulating volume unmount.'
+    'runtime:Locate, copy, mount, and unmount simulator runtime disk images.'
+    'reset:reset a given archive or database'
+  )
+  _describe subcommand commands
+}
+
+_options() {
+  case $line[1] in
+
+    (create)
+      _arguments \
+        ':name:' \
+        ': :_devicetypes' \
+        ':: :{DEVICETYPE=${(Q)words[CURRENT-1]} _runtimes}'
+      ;;
+
+    (clone)
+      _arguments \
+        ': :{FILTER=available_shutdown _devices}' \
+        ':name:' \
+        '::destination device set:_files -/'
+      ;;
+
+    (upgrade)
+      _arguments \
+        ': :{FILTER=shutdown _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _runtimes}'
+      ;;
+
+    (delete)
+      _arguments \
+        '*: :{_devices_unavailable; _devices_all; _devices}'
+      ;;
+
+    (pair)
+      _arguments \
+        ': :{FILTER=watches _devices}' \
+        ': :{FILTER=phones _devices}'
+      ;;
+
+    (unpair|pair_activate)
+      _arguments \
+        ': :_pairs'
+      ;;
+
+    (erase)
+      _arguments \
+        '*: :{_devices_all; FILTER=available_shutdown _devices}'
+      ;;
+
+    (boot)
+      _arguments \
+        ': :{FILTER=available_shutdown _devices; _pairs}' \
+        '--disabledJob=-[disables the given launchd job]' \
+        '--enabledJob=-[enables the given launchd job when it would normally be disabled]'
+      ;;
+
+    (shutdown)
+      _arguments \
+        '*: :{_devices_all; FILTER=booted _devices}'
+      ;;
+
+    (rename)
+      _arguments \
+        ': :_devices' \
+        ':name:'
+      ;;
+
+    (getenv)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':variable name:'
+      ;;
+
+    (openurl)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _urls}'
+      ;;
+
+    (addmedia|addphoto|addvideo)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        '*:path:_files'
+      ;;
+
+    (install)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':path:_files -/'
+      ;;
+
+    (uninstall)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} APPLICATION_TYPE=User _bundle_identifiers}'
+      ;;
+
+    (get_app_container)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
+        ': :{DEVICE=${(Q)words[CURRENT-2]} BUNDLE_IDENTIFIER=${(Q)words[CURRENT-1]} _containers}'
+      ;;
+
+    (install_app_data)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':path:_files -g \*.xcappdata'
+      ;;
+
+    (launch)
+      _arguments \
+        '(-w --wait-for-debugger)'{-w,--wait-for-debugger} \
+        '(--console-pty --stdout --stderr)--console[block and print the application'"'"'s stdout and stderr to the current terminal]' \
+        '(--console --stdout --stderr)--console-pty[block and print the application'"'"'s stdout and stderr to the current terminal via a PTY]' \
+        '(--console --console-pty)--stdout=-[redirect the application'"'"'s standard output to a file]: :_files' \
+        '(--console --console-pty)--stderr=-[redirect the application'"'"'s standard error to a file]: :_files' \
+        '--terminate-running-process[terminate any running copy of the application]' \
+        '(-): :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
+        '*::argv:'
+      ;;
+
+    (terminate)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}'
+      ;;
+
+    (spawn)
+      _arguments \
+        '(-w --wait-for-debugger)'{-w,--wait-for-debugger} \
+        '(-s --standalone)'{-s,--standalone} \
+        '(--arch)-a:arch:' \
+        '(-a)--arch=-:arch:' \
+        '(-): :{FILTER=booted _devices}' \
+        ':path:_files' \
+        '*::argv:'
+      ;;
+
+    (list)
+      _arguments \
+        '(-j --json)'{-j,--json}'[print as JSON]' \
+        '-v[more verbose output]' \
+        ':list:(devices devicetypes runtimes pairs)' \
+        '::search term:(available)'
+      ;;
+
+    (icloud_sync|listapps)
+      _arguments \
+        ': :{FILTER=booted _devices}'
+      ;;
+
+    (pbsync)
+      _arguments \
+        '-p[causes simctl to use promise data for secondary types]' \
+        '-v' \
+        ': :{_host; FILTER=booted _devices}' \
+        ': :{_host; FILTER=booted _devices}'
+      ;;
+
+    (pbcopy|pbpaste)
+      _arguments \
+        '-v' \
+        ': :{FILTER=booted _devices}'
+      ;;
+
+    (help)
+      _arguments \
+        ': :_commands'
+      ;;
+
+    (io)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        '*:: :_io'
+      ;;
+
+    (diagnose)
+      _arguments \
+	'-b[do NOT show the resulting archive in a Finder window upon completion]' \
+	'-X[run all diagnostics with no timeout]' \
+	'--timeout=-[specify a duration (in seconds) to wait for the log collection before timeout]:duration:' \
+	'--output=-[specify the output directory]:path:_files -/' \
+	'--no-archive[do not create an archive, leave the collected files uncompressed]' \
+	'--all-logs[include all device logs, even for non-booted devices]' \
+	'--data-containers[include booted device(s) data directory]' \
+	'--udid=-[collect diagnostics only from the specified device]:device:_devices' \
+        '--create-radar[\[INTERNAL\] create a new radar with the output attached]' \
+        '--radar-component=-[\[INTERNAL\] use this radar component number when --create-radar is provided]' \
+        '--create-smart-radars[\[INTERNAL\] try to discover problems in running Simulators and create radars for them]'
+      ;;
+
+    (logverbose)
+      _arguments \
+        ':: :{FILTER=booted _devices}' \
+        ':state:(enable disable)'
+      ;;
+
+    (status_bar)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        '*:: :_status_bar'
+      ;;
+
+    (ui)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        '*:: :_ui'
+      ;;
+
+    (push)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':: :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
+        ':json file or -:_files -g \*.json'
+      ;;
+
+    (privacy)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ': :_privacy_actions' \
+        ': :_privacy_services' \
+        ':: :{DEVICE=${(Q)words[CURRENT-3]} _bundle_identifiers}'
+      ;;
+
+    (keychain)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        '*:: :_keychain'
+      ;;
+
+    (pbinfo)
+      _arguments \
+        ': :{_host; FILTER=booted _devices}'
+      ;;
+
+    (notify_post|notify_get_state)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':name:'
+      ;;
+
+    (notify_set_state)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':name:' \
+        ':state:'
+      ;;
+
+    (register)
+      _arguments \
+        ': :{_host; FILTER=booted _devices}' \
+        ': :{FILTER=booted _devices}'
+      ;;
+
+    (unregister)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':service:'
+      ;;
+
+    (keyboard)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ':language:'
+      ;;
+
+    (appinfo)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}'
+      ;;
+
+    (bootstatus)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+	'-b[boot the device if it isn'"'"'t already booted]' \
+	'-d[print data migration information, if it'"'"'s available]' \
+	'-c[continuously monitor boot status through multiple boot/shutdown cycles]'
+      ;;
+
+    (darwinup)
+      _arguments \
+	'-f[force operation to succeed at all costs]' \
+	'-n[dry run; prints arguments that would have been sent to darwinup]' \
+	'-s[use the SDK root path instead of the runtime root]' \
+	'-v[more verbose output]' \
+        ':platform:(iphonesimulator watchsimulator appletvsimulator)' \
+        ':command:(install list uninstall)'
+      ;;
+
+    (disk)
+      _arguments \
+        ':operation:(mount unmount)' \
+        ':path:_files'
+      ;;
+
+    (runtime)
+      _arguments \
+        ': :_runtime_operations' \
+        '*:: :_runtime_arguments'
+      ;;
+
+    (reset)
+      _arguments \
+        ': :_devices' \
+        ':subsystem:(launch_services)'
+      ;;
+
+  esac
+}
+
+_io() {
+  _arguments \
+    ': :_io_operations' \
+    '*:: :_io_op_arguments'
+}
+
+_io_operations() {
+  local -a operations
+  operations=(
+    'enumerate:lists all available IO ports and descriptor states'
+    'recordVideo:records the display to a QuickTime movie at the specified file or url'
+    'screenshot:saves a screenshot as a PNG to the specified file or url (use "-" for stdout)'
+  )
+  _describe operation operations
+}
+
+_io_op_arguments() {
+  case $line[1] in
+
+    (enumerate)
+      _arguments \
+        '--poll[poll after enumeration]'
+      ;;
+
+    (recordVideo)
+      _arguments \
+        '--codec=-[specifies the codec type]:codec:(h264 hevc)' \
+        '--display=-:display:(internal external)' \
+        '--mask=-[for non-rectangular displays, handle the mask by policy]:policy:_io_record_masks' \
+        '--force[force the output file to be written to, even if the file already exists]' \
+        ':file or url:_files'
+      ;;
+
+    (screenshot)
+      _arguments \
+        '--type=-:type:(png tiff bmp gif jpeg)' \
+        '--display=-:display:(internal external)' \
+        '--mask=-[for non-rectangular displays, handle the mask by policy]:policy:_io_screenshot_masks' \
+        ':file or url:_files'
+      ;;
+
+  esac
+}
+
+_io_record_masks() {
+  local -a masks
+  masks=(
+    'ignored:the mask is ignored and the unmasked framebuffer is saved'
+    'alpha:not supported, but retained for compatibility; the mask is rendered black'
+    'black:the mask is rendered black'
+  )
+  _describe mask masks
+}
+
+_io_screenshot_masks() {
+  local -a masks
+  masks=(
+    'ignored:the mask is ignored and the unmasked framebuffer is saved'
+    'alpha:the mask is used as premultiplied alpha'
+    'black:the mask is rendered black'
+  )
+  _describe mask masks
+}
+
+_status_bar() {
+  _arguments \
+    ': :_status_bar_operations' \
+    '*:: :_status_bar_arguments'
+}
+
+_status_bar_operations() {
+  local -a operations
+  operations=(
+    'list:list existing overrides'
+    'clear:clear all existing status bar overrides'
+    'override:set status bar override values'
+  )
+  _describe operation operations
+}
+
+_status_bar_arguments() {
+  case $line[1] in
+
+    (override)
+      _arguments \
+	'--time=:string or ISO date:' \
+        '--dataNetwork=:type:(hide wifi 3g 4g lte lte-a lte+ 5g 5g+ 5g-uwb)' \
+        '--wifiMode=:mode:(searching failed active)' \
+        '--wifiBars=:number:(0 1 2 3)' \
+        '--cellularMode=:mode:(notSupported searching failed  active)' \
+        '--cellularBars=:number:(0 1 2 3 4)' \
+        '--operatorName=:name:' \
+        '--batteryState=:state:(charging charged discharging)' \
+        '--batteryLevel=:percent:'
+      ;;
+
+  esac
+}
+
+_ui() {
+  _arguments \
+    ':option:(appearance increase_contrast content_size)' \
+    '*:: :_ui_arguments'
+}
+
+_ui_arguments() {
+  case $line[1] in
+
+    (appearance)
+      _arguments \
+        '::mode:(light dark)'
+      ;;
+
+    (increase_contrast)
+      _arguments \
+        '::status:(enabled disabled)'
+      ;;
+
+    (content_size)
+      _arguments \
+        '::content size category:(increment decrement extra-small small medium large extra-large extra-extra-large extra-extra-extra-large accessibility-medium accessibility-large accessibility-extra-large accessibility-extra-extra-large accessibility-extra-extra-extra-large)'
+      ;;
+
+  esac
+}
+
+_privacy_actions() {
+  local -a actions
+  actions=(
+    'grant:grant access without prompting (requires bundle identifier)'
+    'revoke:revoke access, denying all use of the service (requires bundle identifier)'
+    'reset:reset access, prompting on next use (bundle identifier optional)'
+  )
+  _describe action actions
+}
+
+_privacy_services() {
+  local -a services
+  services=(
+    'all:apply the action to all services'
+    'calendar:allow access to calendar'
+    'contacts-limited:allow access to basic contact info'
+    'contacts:allow access to full contact details'
+    'location:allow access to location services when app is in use'
+    'location-always:allow access to location services at all times'
+    'photos-add:allow adding photos to the photo library'
+    'photos:allow full access to the photo library'
+    'media-library:allow access to the media library'
+    'microphone:allow access to audio input'
+    'motion:allow access to motion and fitness data'
+    'reminders:allow access to reminders'
+    'siri:allow use of the app with Siri'
+  )
+  _describe service services
+}
+
+_keychain() {
+  _arguments \
+    ': :_keychain_actions' \
+    '*:: :_keychain_arguments'
+}
+
+_keychain_actions() {
+  local -a actions
+  actions=(
+    'add-root-cert:add a certificate to the trusted root store'
+    'add-cert:add a certificate to the keychain'
+    'reset:reset the keychain'
+  )
+  _describe action actions
+}
+
+_keychain_arguments() {
+  case $line[1] in
+
+    (add-root-cert|add-cert)
+      _arguments \
+        ':path:_files -g \*.cer -g \*.pem'
+      ;;
+
+  esac
+}
+
+_runtime_operations() {
+  local -a operations
+  operations=(
+    'mount:locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator'
+    'unmount:Unmount the Simulator Runtime if it is mounted'
+    'cache'
+    'pin:pin a device to use a specific runtime'
+    'info'
+    'update_dyld_shared_cache:update the dyld shared cache for a specific runtime'
+    'remove_dyld_shared_cache:removes the dyld shared cache for a specific runtime'
+  )
+  _describe operation operations
+}
+
+_runtime_arguments() {
+  case $line[1] in
+
+    (mount)
+      _arguments \
+        ':train-build:_files' \
+        '--shadow[manually specify a different shadow image]:path:_files' \
+        '(--customer)--internal[(default) select the internal runtime]' \
+        '(--internal)--customer[select the customer (public) runtime]' \
+        '--writable[when mounting the disk image, do not use a shadow file: directly mount the image as writable]'  \
+        '--no-mount[copy the image to the cache (if not present), but do not actually mount it]' \
+        '--no-copy' \
+        '--print-only[print the path to the image on the network but take no other action]' \
+        '--max-cache-size:size:' \
+        '--cache-path:path:_files' \
+        '--mountpoint:mount location:_files' \
+        '--no-sparse' \
+        '--use-nfs'
+      ;;
+
+    (unmount)
+      _arguments \
+        ':train-build:{_files}' \
+        '--force[force-unmount even if the disk is busy]'
+      ;;
+
+    (cache)
+      _arguments \
+        ': :_runtime_cache_commands' \
+        '*:: :_runtime_cache_arguments' \
+        '--cache_path:path:_files'
+      ;;
+
+    (pin)
+      _arguments \
+        ': :_devices' \
+        '(--build --path)--latest[(default) use the latest build of the major.minor.revision runtime]' \
+        '(--latest --path)--build[pin the device to use a specific build of the runtime]:train-version:' \
+        '(--latest --build)--path[pin the device to use a specific runtime by path]:path to runtime:_files'
+      ;;
+
+    (info)
+      _arguments \
+        ': :_runtime_info_commands' \
+        '*:: :_runtime_info_arguments'
+      ;;
+
+    (update_dyld_shared_cache|remove_dyld_shared_cache)
+      _arguments \
+        '::platform or train-build:_files'
+      ;;
+
+  esac
+}
+
+_runtime_cache_commands() {
+  local -a commands
+  commands=(
+    'list:lists cached runtime disk images'
+    'clear:deletes all simulator runtime disk images'
+  )
+  _describe command commands
+}
+
+_runtime_cache_arguments() {
+  case $line[1] in
+
+    (clear)
+      _arguments \
+        '--dry-run[run the clear command but print what would have been deleted, without actually deleting anything]'
+      ;;
+
+  esac
+
+  _arguments \
+    '--cache-path:path:_files'
+}
+
+_runtime_info_commands() {
+  local -a commands
+  commands=(
+    'path:lists the path to the runtime'
+  )
+  _describe command commands
+}
+
+_runtime_info_arguments() {
+  case $line[1] in
+
+    (path)
+      _arguments \
+        '::platform or train-build:(iOS tvOS watchOS)'
+      ;;
+
+  esac
+}
+
+_devicetypes() {
+  local -a devicetypes
+  devicetypes=(${(f)"$(xcrun simctl list devicetypes -j | jq -r '.devicetypes[].name')"})
+  _describe 'device type' devicetypes
+}
+
+_runtimes() {
+  local -a runtimes
+  runtimes=(${(f)"$(xcrun simctl list -j | jq -r '
+    (
+      $ENV.DEVICETYPE
+      // first(.devices[][] | select(.udid == ($ENV.DEVICE // "none"))).deviceTypeIdentifier
+      // ""
+    ) as $devicetype
+    | (
+      .devicetypes | map(select(
+        ((.identifier | ascii_downcase) | contains($devicetype | ascii_downcase))
+        or ((.name | ascii_downcase) | contains($devicetype | ascii_downcase))
+      )) | INDEX(.identifier)
+    ) as $devicetypes
+    | .runtimes |= (sort_by([{iOS:"x"}[.platform] // .platform, .buildversion]) | reverse)
+    | .runtimes[]
+    | select(.isAvailable)
+    | select(any($devicetypes[.supportedDeviceTypes[].identifier]; .))
+    | "\(.identifier):\(.name) (\(.version) - \(.buildversion))"
+  ')"})
+  _describe -V runtime runtimes
+}
+
+_devices() {
+  local -a devices
+  devices=(${(f)"$(xcrun simctl list -j | jq -r '
+    (.devicetypes | INDEX(.identifier)) as $devicetypes
+    | (.runtimes | INDEX(.identifier)) as $runtimes
+    | .devices |= with_entries(.value[].runtime = $runtimes[.key])
+    | .devices[][] |= (.devicetype = $devicetypes[.deviceTypeIdentifier])
+    | [.devices[][]] | sort_by(.logPathSize) | reverse[]
+    | select(contains(
+      {
+        available_shutdown: {isAvailable: true, state: "Shutdown"},
+        shutdown: {state: "Shutdown"},
+        booted: {state: "Booted"},
+        watches: {devicetype: {productFamily: "Apple Watch"}},
+        phones: {devicetype: {productFamily: "iPhone"}},
+      }[$ENV.FILTER // "none"] // {}
+    ))
+    | "\(.udid):\(.name) (\(.devicetype.name // "unknown type"), \(.runtime.name // .availabilityError)) (\(.state))"
+  ')"})
+  _describe -V device devices
+}
+
+_devices_all() {
+  local -a devices
+  devices=(
+    all:'all devices'
+  )
+  _describe -V device devices
+}
+
+_devices_unavailable() {
+  local -a devices
+  devices=(
+    unavailable:'devices not supported by the current Xcode SDK'
+  )
+  _describe -V device devices
+}
+
+_pairs() {
+  local -a pairs
+  pairs=(${(f)"$(xcrun simctl list pairs -j | jq -r '
+    .pairs | to_entries[] |
+    "\(.key):\(.value.watch.name) - \(.value.phone.name) \(.value.state)"
+  ')"})
+  _describe pair pairs
+}
+
+_urls() {
+  local -a urls
+  urls+=('http\://' 'https\://')
+  urls+=(${(f)"$(
+    xcrun simctl listapps "$DEVICE" 2>/dev/null |
+      plutil -convert json - -o - |
+      jq -r 2>/dev/null '[.[]] | sort_by(.ApplicationType) | reverse[].Path' |
+      while read app; do plutil -convert json "$app"/Info.plist -o -; done |
+      jq -r '[.CFBundleURLTypes[]?.CFBundleURLSchemes[]?] - ["http", "https"] | .[] + "\\:"'
+  )"})
+  _describe -V url urls
+}
+
+_bundle_identifiers() {
+  local -a identifiers
+  identifiers=(${(f)"$(
+    xcrun simctl listapps "$DEVICE" 2>/dev/null |
+      plutil -convert json - -o - |
+      jq -r 2>/dev/null '
+        [.[]] | sort_by(.ApplicationType) | reverse[]
+        | select(.ApplicationType == ($ENV.APPLICATION_TYPE // .ApplicationType))
+        | "\(.CFBundleIdentifier):\(.CFBundleDisplayName)"
+        + if .ApplicationType == "User" then " (\(.CFBundleVersion))" else "" end
+      '
+  )"})
+  _describe -V 'bundle identifier' identifiers
+}
+
+_containers() {
+  local -a containers
+  containers+=(app data groups)
+  containers+=(${(f)"$(
+    xcrun simctl listapps "$DEVICE" 2>/dev/null |
+      plutil -convert json - -o - |
+      jq -r 2>/dev/null '.[] | select(.CFBundleIdentifier == $ENV.BUNDLE_IDENTIFIER) | .GroupContainers | keys[]'
+    )"})
+  _describe -V container containers
+}
+
+_host() {
+  local -a host
+  host=(
+    host
+  )
+  _describe -V device host
+}
