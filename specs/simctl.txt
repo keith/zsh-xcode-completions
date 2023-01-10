@@ -57,8 +57,9 @@ Contacts support the vCard format.
 
 xcrun simctl help boot
 Boot a device or device pair.
-Usage: simctl boot <device> [--disabledJob=<job>] [--enabledJob=<job>]
+Usage: simctl boot <device> [--arch=<arch>] [--disabledJob=<job>] [--enabledJob=<job>]
 
+	--arch=<arch>           Specify the architecture to use when booting the simulator (eg: 'arm64' or 'x86_64')
 	--disabledJob=<job>     Disables the given launchd job. Multiple jobs can be disabled by passing multiple flags.
 	--enabledJob=<job>      Enables the given launchd job when it would normally be disabled.
 	                        Multiple jobs can be enabled by passing multiple flags.

@@ -113,6 +113,7 @@ _options() {
     (boot)
       _arguments \
         ': :{FILTER=available_shutdown _devices; _pairs}' \
+        '--arch=-[specify the architecture to use when booting the simulator]:arch:(arm64 x86_64)' \
         '--disabledJob=-[disables the given launchd job]' \
         '--enabledJob=-[enables the given launchd job when it would normally be disabled]'
       ;;
