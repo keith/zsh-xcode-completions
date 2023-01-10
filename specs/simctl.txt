@@ -533,23 +533,6 @@ NOTE: If you install or uninstall roots, you must manually update the dyld_sim s
       See simctl help runtime for information about triggering a dyld_sim shared cache rebuild.
 
 
-xcrun simctl help disk
-Perform disk operations, like simulating volume unmount.
-Usage: simctl disk <operation> <arguments>
-
-Supported Operations:
-	mount <path>
-	     Simulate mounting the given path. This will look for runtime profiles in a mountable disk image.
-	     The path will automatically be truncated to the root of the volume that contains it.
-	     As a special exception, if the path contains 'Xcode{-beta}.app it will also register that Xcode's developer
-	     directory with CoreSimulator as if a client had done so.
-	unmount <path>
-	     Simulate unmounting the given path. This can  be a mountable disk image path or volume containing Xcode.
-	     The path will automatically be truncated to the root of the volume that contains it.
-	     Any booted simulators using profiles on this volume will be shutdown. Any profiles on this volume will
-	     become unavailable.
-Note: The path you pass must be to an unmountable volume. Passing '/' is not supported.
-
 
 xcrun simctl help runtime
 Locate, copy, mount, and unmount simulator runtime disk images.

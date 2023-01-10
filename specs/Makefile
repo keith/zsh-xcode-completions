@@ -42,8 +42,6 @@ simctl:
 	@echo
 	xcrun simctl help darwinup
 	@echo
-	xcrun simctl help disk
-	@echo
 	xcrun simctl help runtime
 	@echo
 	xcrun simctl help reset

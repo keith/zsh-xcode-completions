@@ -60,7 +60,6 @@ _commands() {
     'listapps:show the installed applications'
     'bootstatus:Checks device boot status.'
     'darwinup:Invoke darwinup to install a root for the specified simulator runtime.'
-    'disk:Perform disk operations, like simulating volume unmount.'
     'runtime:Locate, copy, mount, and unmount simulator runtime disk images.'
     'reset:reset a given archive or database'
   )
@@ -352,12 +351,6 @@ _options() {
 	'-v[more verbose output]' \
         ':platform:(iphonesimulator watchsimulator appletvsimulator)' \
         ':command:(install list uninstall)'
-      ;;
-
-    (disk)
-      _arguments \
-        ':operation:(mount unmount)' \
-        ':path:_files'
       ;;
 
     (runtime)
