@@ -182,6 +182,11 @@ Supported operations:
 
 	    --force      Force the output file to be written to, even if the file already exists.
 
+	simctl writes 'Recording started' to stderr once the first video frame has been processed. Look for this
+	if you want to wait for the recording to start.
+	Send SIGINT (Control + C) to stop recording. simctl exits once the in-flight frames are processed
+	and the video file is finalized.
+
 	screenshot [--type=<type>] [--display=<display>] [--mask=<policy>] <file or url>
 	    Saves a screenshot as a PNG to the specified file or url(use "-" for stdout).
 	    --type       Can be "png", "tiff", "bmp", "gif", "jpeg". Default is png.
