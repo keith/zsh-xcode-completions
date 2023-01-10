@@ -530,16 +530,16 @@ commands:
 	See darwinup usage for additional commands and more information.
 
 NOTE: If you install or uninstall roots, you must manually update the dyld_sim shared cache.
-      See simctl help runtime for information about triggering a dyld_sim shared cache rebuild.
+      See simctl help legacyruntime for information about triggering a dyld_sim shared cache rebuild.
 
 
 
-xcrun simctl help runtime
+xcrun simctl help legacyruntime
 Locate, copy, mount, and unmount simulator runtime disk images.
-Usage: simctl runtime <operation> <arguments>
+Usage: simctl legacyruntime <operation> <arguments>
 
 Supported Operations:
-    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--max-cache-size <size>] [--cache-path <path>] [--mountpoint <mount location>]
+    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--max-cache-size <size>] [--cache-path <path>]
 	Locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator.
 
 	--internal
@@ -588,8 +588,10 @@ Supported Operations:
     pin <device> [--latest | --build <train-version> | --path <path to runtime>]
 	Pin a device to use a specific runtime.
 
-	--latest
-	     (Default) Use the latest build of the major.minor.revision runtime.
+	--system
+	     (Default) Use the system policy. Customer OS: match SDK build if possible. All others use latest.
+	--newest
+	     Always use the newest build matching the semantic version.
 	--build <train-version>
 	     Pin the device to use a specific build of the runtime. If multiple runtimes match one is randomly chosen.
 	--path <path to runtime>
@@ -627,8 +629,6 @@ Unless a simulated device specifies an explicit build, it will boot with the new
 For example if a device was created with iOS 12.0, it will prefer the newest build of iOS 12.0 it can find. You can have as many builds of iOS 12 mounted
 as you like, but only devices pinned to a runtime will use any other build besides the latest. To change an existing device's pinning
 use pin (see above).
-To create a device pre-pinned to a runtime specify the runtime as a path to the mounted volume rather than an identifier, eg:
-  simctl create <name> <devicetype> /Volumes/Example10A101
 Other commands that take a runtime identifier (such as simctl darwinup) also accept a <train-version> or path to the disk image mount point, so long as you specify
 enough information to uniquely identify a single runtime. If the specifier is ambiguous simctl will error rather than making any assumptions.
 
