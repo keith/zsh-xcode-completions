@@ -454,7 +454,7 @@ _status_bar_arguments() {
     (override)
       _arguments \
 	'--time=:string or ISO date:' \
-        '--dataNetwork=:type:(hide wifi 3g 4g lte lte-a lte+ 5g 5g+ 5g-uwb)' \
+        '--dataNetwork=:type:(hide wifi 3g 4g lte lte-a lte+ 5g 5g+ 5g-uwb 5g-uc)' \
         '--wifiMode=:mode:(searching failed active)' \
         '--wifiBars=:number:(0 1 2 3)' \
         '--cellularMode=:mode:(notSupported searching failed  active)' \
