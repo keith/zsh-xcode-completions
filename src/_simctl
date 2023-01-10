@@ -204,6 +204,7 @@ _options() {
     (list)
       _arguments \
         '(-j --json)'{-j,--json}'[print as JSON]' \
+        '(-e --no-escape-slashes)'{-e,--no-escape-slashes}'[encode slashes without escapes in JSON output]' \
         '-v[more verbose output]' \
         ':list:(devices devicetypes runtimes pairs)' \
         '::search term:(available)'
