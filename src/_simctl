@@ -22,6 +22,7 @@ _commands() {
     'boot:boot a device or device pair'
     'shutdown:shutdown a device'
     'rename:rename a device'
+    'runtime:perform operations on runtimes'
     'getenv:print an environment variable from a running device'
     'openurl:open a URL in a device'
     'addmedia:add photos, live photos, videos, or contacts to the library of a device'
@@ -128,6 +129,12 @@ _options() {
       _arguments \
         ': :_devices' \
         ':name:'
+      ;;
+
+    (runtime)
+      _arguments \
+        ': :_runtime_operations' \
+        '*:: :_runtime_arguments'
       ;;
 
     (getenv)
@@ -375,6 +382,92 @@ _options() {
       ;;
 
   esac
+}
+
+_runtime_operations() {
+  local -a operations
+  operations=(
+    'add:add a runtime disk image to the secure storage area'
+    'delete:delete a simulator runtime from the secure storage area'
+    'verify:re-verify the signature of a given runtime'
+    'list:list runtime disk images'
+    'match'
+  )
+  _describe operation operations
+}
+
+_runtime_arguments() {
+  case $line[1] in
+
+    (add)
+      _arguments \
+        ':path:_files' \
+        '(-m --move)'{-m,--move}'[remove the original file if the image is added successfully]' \
+        '(-a --async)'{-a,--async}'[print the UUID of the new image then exit, do not wait on the results of the add operation]'
+      ;;
+
+    (delete)
+      _arguments \
+        '::identifier:_runtime_identifiers' \
+        '(-d --notUsedSinceDays)'{-d,--notUsedSinceDays}'[delete images not used within the past <days> days]:days:' \
+        '(-n --dry-run)'{-n,--dry-run}'[print what images would be deleted without actually deleting anything]'
+      ;;
+
+    (verify)
+      _arguments \
+        '::identifier:_runtime_identifiers'
+      ;;
+
+    (list)
+      _arguments \
+        '-v[print more verbose output]' \
+        '(-j --json)'{-j,--json}'[print as JSON]'
+      ;;
+
+    (match)
+      _arguments \
+        ': :_runtime_match_operations' \
+        '*:: :_runtime_match_arguments'
+      ;;
+
+  esac
+}
+
+_runtime_match_operations() {
+  local -a operations
+  operations=(
+    'list:list the SDK build to runtime build mapping rules for the selected Xcode'
+    'set:override the SDK to runtime build mapping'
+  )
+  _describe operation operations
+}
+
+_runtime_match_arguments() {
+  case $line[1] in
+
+    (list)
+      _arguments \
+        '-v[verbose mode]' \
+        '(-j --json)'{-j,--json}'[print as JSON]'
+      ;;
+
+    (set)
+      _arguments \
+        ':sdk canonical name:' \
+        '::runtime build:' \
+        '--default[clear the override for the given SDK and revert to default behavior]' \
+        '--sdkBuild[explicitly specify the SDK build]:sdk build:'
+      ;;
+
+  esac
+}
+
+_runtime_identifiers() {
+  local -a identifiers
+  identifiers=(${(f)"$(xcrun simctl runtime list -j | jq -r '
+    .[] | "\(.identifier):\(.runtimeIdentifier // "(\(.state) - \(.unusableSubstate): \(.unusableErrorMessage))")"
+  ')"})
+  _describe -V identifier identifiers
 }
 
 _location() {

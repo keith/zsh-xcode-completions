@@ -37,6 +37,7 @@ Subcommands:
 	privacy             Grant, revoke, or reset privacy and permissions
 	push                Send a simulated push notification
 	rename              Rename a device.
+	runtime             Perform operations on runtimes
 	shutdown            Shutdown a device.
 	spawn               Spawn a process by executing a given executable on a device.
 	status_bar          Set or clear status bar overrides
@@ -379,6 +380,73 @@ Only application remote push notifications are supported. VoIP, Complication, Fi
 xcrun simctl help rename
 Rename a device.
 Usage: simctl rename <device> <name>
+
+xcrun simctl help runtime
+Perform operations on runtimes
+Usage: simctl runtime <operation> <arguments>
+
+Supported Operations:
+	add <path> [-ma]
+	     Add a runtime disk image to the secure storage area. The image will be staged, verified, and mounted.
+	     When possible the image file will be cloned so no additional disk space will be used.
+	     If stdout is a terminal and a copy is required then progress will be reported.
+
+	     --move | -m
+	          Remove the original file if the image is added successfully. If the image cannot be staged
+	          or the add fails the original is not removed.
+	     --async | -a
+	          Print the UUID of the new image then exit, do not wait on the results of the add operation.
+
+	delete (<identifier>|--notUsedSinceDays <days>) [--dry-run]
+	     Delete a simulator runtime from the secure storage area. If runtime is a disk image
+	     any booted simulators are shutdown and the disk is unmounted first.
+	     Use the alias 'all' to delete all images.
+
+	     --notUsedSinceDays <days> | -d <days>
+	          Delete images not used within the past <days> days.
+	     --dry-run | -n
+	          Print what images would be deleted without actually deleting anything.
+
+	verify <identifier>
+	     Re-verify the signature of a given runtime.
+
+	list [-v] [-j | --json]
+	     List runtime disk images, optionally outputting JSON to stdout.
+	     -v
+	          Print more verbose output
+	     -j
+	          Print as JSON
+
+	match list [-v] [-j | --json]
+	     List the SDK build to runtime build mapping rules for the selected Xcode.
+	     Preferred means the runtime was either bundled with Xcode, exactly matched your SDK version,
+	     or the downloadable index indicated a better match for your SDK
+.	     Manual overrides using 'match set' have the highest priority.
+
+	     -v
+	          Verbose mode. Includes the full preferred build map, user override map, and known SDK names.
+	     -j
+	          Print as JSON
+
+	match set <sdk canonical name> (<runtime build> || --default) [--sdkBuild <sdk build>]
+	     Override the SDK to runtime build mapping. This controls which build of a given runtime
+	     Xcode will prefer for building and running when using that SDK. This matters most
+	     often during Beta releases when there are multiple builds for a given OS version.
+	     If --sdkBuild is not specified it is assumed you mean the SDK build for the currently selected Xcode.
+
+	     Note: Remember this is about build numbers, not semantic versions. When using the iOS 16.0 SDK Xcode
+	     will always prefer an iOS 16.0 runtime. Matching policy controls what to do when there are multiple
+	     iOS 16.0 runtimes available,
+	      eg if the iOS 16.0 SDK is 20A245 and the available runtimes are (20A248, 20A252, 20A254) which one
+	         should Xcode use for building, SwiftUI Previews, and when launching iOS 16.0 Simulators?
+	         They are all iOS 16.0 runtimes so a policy must decide which one is selected.
+
+	     --default
+	          Clear the override for the given SDK and revert to default behavior.
+	     --sdkBuild
+	          Explicitly specify the SDK build, eg for an Xcode other than the selected Xcode.
+
+
 
 xcrun simctl help shutdown
 Shutdown a device.
