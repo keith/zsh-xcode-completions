@@ -22,6 +22,7 @@ _commands() {
     'boot:boot a device or device pair'
     'shutdown:shutdown a device'
     'rename:rename a device'
+    'runtime:perform operations on runtimes'
     'getenv:print an environment variable from a running device'
     'openurl:open a URL in a device'
     'addmedia:add photos, live photos, videos, or contacts to the library of a device'
@@ -33,6 +34,7 @@ _commands() {
     'terminate:terminate an application by identifier on a device'
     'spawn:spawn a process by executing a given executable on a device'
     'list:list available devices, device types, runtimes, or device pairs'
+    'location:control a device'"'"'s simulated location'
     'icloud_sync:trigger iCloud sync on a device'
     'pbsync:sync the pasteboard content from one pasteboard to another'
     'pbcopy:copy standard input onto the device pasteboard'
@@ -46,21 +48,21 @@ _commands() {
     'push:send a simulated push notification'
     'privacy:grant, revoke, or reset privacy and permissions'
     'keychain:manipulate a device'"'"'s keychain'
-    'addphoto:Add photos to the photo library of a device.'
-    'addvideo:Add videos to the photo library of a device.'
-    'pbinfo:Print information about the device'"'"'s pasteboard'
-    'notify_post:Post a darwin notification on a device.'
-    'notify_get_state:Get the state value of a darwin notification on a device.'
-    'notify_set_state:Set the state value of a darwin notification on a device.'
-    'register:Register a service from one bootstrap into another.'
-    'unregister:Unregister a service from a device'"'"'s bootstrap.'
-    'keyboard:Set the device'"'"'s keyboard language.'
-    'monitor:List notifications as they arrive.'
-    'appinfo:Show information about an installed application.'
+    'addphoto:add photos to the photo library of a device'
+    'addvideo:add videos to the photo library of a device'
+    'pbinfo:print information about the device'"'"'s pasteboard'
+    'notify_post:post a darwin notification on a device'
+    'notify_get_state:get the state value of a darwin notification on a device'
+    'notify_set_state:set the state value of a darwin notification on a device'
+    'register:register a service from one bootstrap into another'
+    'unregister:unregister a service from a device'"'"'s bootstrap'
+    'keyboard:set the device'"'"'s keyboard language'
+    'monitor:list notifications as they arrive'
+    'appinfo:show information about an installed application'
     'listapps:show the installed applications'
-    'bootstatus:Checks device boot status.'
-    'darwinup:Invoke darwinup to install a root for the specified simulator runtime.'
-    'legacyruntime:Locate, copy, mount, and unmount simulator runtime disk images.'
+    'bootstatus:checks device boot status'
+    'darwinup:invoke darwinup to install a root for the specified simulator runtime'
+    'legacyruntime:locate, copy, mount, and unmount simulator runtime disk images'
     'reset:reset a given archive or database'
   )
   _describe subcommand commands
@@ -127,6 +129,12 @@ _options() {
       _arguments \
         ': :_devices' \
         ':name:'
+      ;;
+
+    (runtime)
+      _arguments \
+        ': :_runtime_operations' \
+        '*:: :_runtime_arguments'
       ;;
 
     (getenv)
@@ -209,6 +217,12 @@ _options() {
         '-v[more verbose output]' \
         ':list:(devices devicetypes runtimes pairs)' \
         '::search term:(available)'
+      ;;
+
+    (location)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        '*:: :_location'
       ;;
 
     (icloud_sync|listapps)
@@ -365,6 +379,134 @@ _options() {
       _arguments \
         ': :_devices' \
         ':subsystem:(launch_services)'
+      ;;
+
+  esac
+}
+
+_runtime_operations() {
+  local -a operations
+  operations=(
+    'add:add a runtime disk image to the secure storage area'
+    'delete:delete a simulator runtime from the secure storage area'
+    'verify:re-verify the signature of a given runtime'
+    'list:list runtime disk images'
+    'match'
+  )
+  _describe operation operations
+}
+
+_runtime_arguments() {
+  case $line[1] in
+
+    (add)
+      _arguments \
+        ':path:_files' \
+        '(-m --move)'{-m,--move}'[remove the original file if the image is added successfully]' \
+        '(-a --async)'{-a,--async}'[print the UUID of the new image then exit, do not wait on the results of the add operation]'
+      ;;
+
+    (delete)
+      _arguments \
+        '::identifier:_runtime_identifiers' \
+        '(-d --notUsedSinceDays)'{-d,--notUsedSinceDays}'[delete images not used within the past <days> days]:days:' \
+        '(-n --dry-run)'{-n,--dry-run}'[print what images would be deleted without actually deleting anything]'
+      ;;
+
+    (verify)
+      _arguments \
+        '::identifier:_runtime_identifiers'
+      ;;
+
+    (list)
+      _arguments \
+        '-v[print more verbose output]' \
+        '(-j --json)'{-j,--json}'[print as JSON]'
+      ;;
+
+    (match)
+      _arguments \
+        ': :_runtime_match_operations' \
+        '*:: :_runtime_match_arguments'
+      ;;
+
+  esac
+}
+
+_runtime_match_operations() {
+  local -a operations
+  operations=(
+    'list:list the SDK build to runtime build mapping rules for the selected Xcode'
+    'set:override the SDK to runtime build mapping'
+  )
+  _describe operation operations
+}
+
+_runtime_match_arguments() {
+  case $line[1] in
+
+    (list)
+      _arguments \
+        '-v[verbose mode]' \
+        '(-j --json)'{-j,--json}'[print as JSON]'
+      ;;
+
+    (set)
+      _arguments \
+        ':sdk canonical name:' \
+        '::runtime build:' \
+        '--default[clear the override for the given SDK and revert to default behavior]' \
+        '--sdkBuild[explicitly specify the SDK build]:sdk build:'
+      ;;
+
+  esac
+}
+
+_runtime_identifiers() {
+  local -a identifiers
+  identifiers=(${(f)"$(xcrun simctl runtime list -j | jq -r '
+    .[] | "\(.identifier):\(.runtimeIdentifier // "(\(.state) - \(.unusableSubstate): \(.unusableErrorMessage))")"
+  ')"})
+  _describe -V identifier identifiers
+}
+
+_location() {
+  _arguments \
+    ': :_location_actions' \
+    '*:: :_location_arguments'
+}
+
+_location_actions() {
+  local -a actions
+  actions=(
+    'list:list available simulation scenarios'
+    'clear:stop any running scenario and clear any simulated location'
+    'set:set the location to a specific latitude and longitude'
+    'run:run a simulated location scenario (use the list action to get a list of scenarios)'
+    'start:set the location to a series of waypoints'
+  )
+  _describe action actions
+}
+
+_location_arguments() {
+  case $line[1] in
+
+    (set)
+      _arguments \
+        ':lat1,lon1:'
+      ;;
+
+    (run)
+      _arguments \
+        ':scenario:'
+      ;;
+
+    (start)
+      _arguments \
+        '--speed=-:meters/sec:' \
+        '(--interval)--distance=-:meters per second:' \
+        '(--distance)--interval=-:seconds:' \
+        '*::latN,lonN:'
       ;;
 
   esac
@@ -557,7 +699,7 @@ _legacyruntime_operations() {
   local -a operations
   operations=(
     'mount:locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator'
-    'unmount:Unmount the Simulator Runtime if it is mounted'
+    'unmount:unmount the Simulator Runtime if it is mounted'
     'cache'
     'pin:pin a device to use a specific runtime'
     'info'
@@ -594,8 +736,8 @@ _legacyruntime_arguments() {
 
     (cache)
       _arguments \
-        ': :_runtime_cache_commands' \
-        '*:: :_runtime_cache_arguments' \
+        ': :_legacyruntime_cache_commands' \
+        '*:: :_legacyruntime_cache_arguments' \
         '--cache_path:path:_files'
       ;;
 
@@ -610,8 +752,8 @@ _legacyruntime_arguments() {
 
     (info)
       _arguments \
-        ': :_runtime_info_commands' \
-        '*:: :_runtime_info_arguments'
+        ': :_legacyruntime_info_commands' \
+        '*:: :_legacyruntime_info_arguments'
       ;;
 
     (update_dyld_shared_cache|remove_dyld_shared_cache)
@@ -622,7 +764,7 @@ _legacyruntime_arguments() {
   esac
 }
 
-_runtime_cache_commands() {
+_legacyruntime_cache_commands() {
   local -a commands
   commands=(
     'list:lists cached runtime disk images'
@@ -631,7 +773,7 @@ _runtime_cache_commands() {
   _describe command commands
 }
 
-_runtime_cache_arguments() {
+_legacyruntime_cache_arguments() {
   case $line[1] in
 
     (clear)
@@ -645,7 +787,7 @@ _runtime_cache_arguments() {
     '--cache-path:path:_files'
 }
 
-_runtime_info_commands() {
+_legacyruntime_info_commands() {
   local -a commands
   commands=(
     'path:lists the path to the runtime'
@@ -653,7 +795,7 @@ _runtime_info_commands() {
   _describe command commands
 }
 
-_runtime_info_arguments() {
+_legacyruntime_info_arguments() {
   case $line[1] in
 
     (path)
