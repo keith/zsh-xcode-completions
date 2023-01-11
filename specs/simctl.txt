@@ -9,41 +9,67 @@ If multiple devices are booted when the "booted" device is selected, simctl
 will choose one of them.
 
 Subcommands:
-	create              Create a new device.
-	clone               Clone an existing device.
-	upgrade             Upgrade a device to a newer runtime.
-	delete              Delete specified devices, unavailable devices, or all devices.
-	pair                Create a new watch and phone pair.
-	unpair              Unpair a watch and phone pair.
-	pair_activate       Set a given pair as active.
-	erase               Erase a device's contents and settings.
-	boot                Boot a device or device pair.
-	shutdown            Shutdown a device.
-	rename              Rename a device.
-	getenv              Print an environment variable from a running device.
-	openurl             Open a URL in a device.
 	addmedia            Add photos, live photos, videos, or contacts to the library of a device.
-	install             Install an app on a device.
-	uninstall           Uninstall an app from a device.
+	boot                Boot a device or device pair.
+	clone               Clone an existing device.
+	create              Create a new device.
+	delete              Delete specified devices, unavailable devices, or all devices.
+	diagnose            Collect diagnostic information and logs.
+	erase               Erase a device's contents and settings.
 	get_app_container   Print the path of the installed app's container
-	install_app_data    Install an xcappdata package to a device, replacing the current contents of the container.
-	launch              Launch an application by identifier on a device.
-	terminate           Terminate an application by identifier on a device.
-	spawn               Spawn a process by executing a given executable on a device.
-	list                List available devices, device types, runtimes, or device pairs.
+	getenv              Print an environment variable from a running device.
+	help                Prints the usage for a given subcommand.
 	icloud_sync         Trigger iCloud sync on a device.
-	pbsync              Sync the pasteboard content from one pasteboard to another.
+	install             Install an app on a device.
+	install_app_data    Install an xcappdata package to a device, replacing the current contents of the container.
+	io                  Set up a device IO operation.
+	keychain            Manipulate a device's keychain
+	launch              Launch an application by identifier on a device.
+	list                List available devices, device types, runtimes, or device pairs.
+	logverbose          enable or disable verbose logging for a device
+	openurl             Open a URL in a device.
+	pair                Create a new watch and phone pair.
+	pair_activate       Set a given pair as active.
 	pbcopy              Copy standard input onto the device pasteboard.
 	pbpaste             Print the contents of the device's pasteboard to standard output.
-	help                Prints the usage for a given subcommand.
-	io                  Set up a device IO operation.
-	diagnose            Collect diagnostic information and logs.
-	logverbose          enable or disable verbose logging for a device
-	status_bar          Set or clear status bar overrides
-	ui                  Get or Set UI options
-	push                Send a simulated push notification
+	pbsync              Sync the pasteboard content from one pasteboard to another.
 	privacy             Grant, revoke, or reset privacy and permissions
-	keychain            Manipulate a device's keychain
+	push                Send a simulated push notification
+	rename              Rename a device.
+	shutdown            Shutdown a device.
+	spawn               Spawn a process by executing a given executable on a device.
+	status_bar          Set or clear status bar overrides
+	terminate           Terminate an application by identifier on a device.
+	ui                  Get or Set UI options
+	uninstall           Uninstall an app from a device.
+	unpair              Unpair a watch and phone pair.
+	upgrade             Upgrade a device to a newer runtime.
+
+xcrun simctl help addmedia
+Add photos, live photos, videos, or contacts to the library of a device.
+Usage: simctl addmedia <device> <path> [... <path>]
+
+You can specify multiple files including a mix of photos, videos, and contacts.
+
+You can also specify multiple live photos by providing the photo and video files. They will automatically be discovered and imported correctly.
+
+Contacts support the vCard format.
+
+xcrun simctl help boot
+Boot a device or device pair.
+Usage: simctl boot <device> [--arch=<arch>] [--disabledJob=<job>] [--enabledJob=<job>]
+
+	--arch=<arch>           Specify the architecture to use when booting the simulator (eg: 'arm64' or 'x86_64')
+	--disabledJob=<job>     Disables the given launchd job. Multiple jobs can be disabled by passing multiple flags.
+	--enabledJob=<job>      Enables the given launchd job when it would normally be disabled.
+	                        Multiple jobs can be enabled by passing multiple flags.
+
+
+If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
+
+xcrun simctl help clone
+Clone an existing device.
+Usage: simctl clone <device> <new name> [<destination device set>]
 
 xcrun simctl help create
 Create a new device.
@@ -57,211 +83,11 @@ Usage: simctl create <name> <device type id> [<runtime id>]
 	                               "/Volumes/path/to/Runtimes/watchOS 3.2.simruntime")
 
 
-xcrun simctl help clone
-Clone an existing device.
-Usage: simctl clone <device> <new name> [<destination device set>]
-
-xcrun simctl help upgrade
-Upgrade a device to a newer runtime.
-Usage: simctl upgrade <device> <runtime id>
-
 xcrun simctl help delete
 Delete specified devices, unavailable devices, or all devices.
 Usage: simctl delete <device> [... <device n>] | unavailable | all
 
 Specifying unavailable will delete devices that are not supported by the current Xcode SDK.
-
-
-xcrun simctl help pair
-Create a new watch and phone pair.
-Usage: simctl pair <watch device> <phone device>
-
-xcrun simctl help unpair
-Unpair a watch and phone pair.
-Usage: simctl unpair <pair UUID>
-
-xcrun simctl help pair_activate
-Set a given pair as active.
-Usage: simctl pair_activate <pair>
-
-xcrun simctl help erase
-Erase a device's contents and settings.
-Usage: simctl erase <device> [... <device n>] | all
-
-Specifying all will erase all existing devices.
-
-xcrun simctl help boot
-Boot a device or device pair.
-Usage: simctl boot <device> [--disabledJob=<job>] [--enabledJob=<job>]
-
-	--disabledJob=<job>     Disables the given launchd job. Multiple jobs can be disabled by passing multiple flags.
-	--enabledJob=<job>      Enables the given launchd job when it would normally be disabled.
-	                        Multiple jobs can be enabled by passing multiple flags.
-
-
-If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
-
-xcrun simctl help shutdown
-Shutdown a device.
-Usage: simctl shutdown <device> | all
-
-Specifying all will shut down all running devices
-
-xcrun simctl help rename
-Rename a device.
-Usage: simctl rename <device> <name>
-
-xcrun simctl help getenv
-Print an environment variable from a running device.
-Usage: simctl getenv <device> <variable name>
-
-xcrun simctl help openurl
-Open a URL in a device.
-Usage: simctl openurl <device> <URL>
-
-xcrun simctl help addmedia
-Add photos, live photos, videos, or contacts to the library of a device.
-Usage: simctl addmedia <device> <path> [... <path>]
-
-You can specify multiple files including a mix of photos, videos, and contacts.
-
-You can also specify multiple live photos by providing the photo and video files. They will automatically be discovered and imported correctly.
-
-Contacts support the vCard format.
-
-xcrun simctl help install
-Install an app on a device.
-Usage: simctl install <device> <path>
-
-xcrun simctl help uninstall
-Uninstall an app from a device.
-Usage: simctl uninstall <device> <app bundle identifier>
-
-xcrun simctl help get_app_container
-Print the path of the installed app's container
-Usage: simctl get_app_container <device> <app bundle identifier> [<container>]
-
-container   Optionally specify the container. Defaults to app.
-  app                 The .app bundle
-  data                The application's data container
-  groups              The App Group containers
-  <group identifier>  A specific App Group container
-
-
-
-xcrun simctl help install_app_data
-Install an xcappdata package to a device, replacing the current contents of the container.
-Usage: simctl install_app_data <device> <path to xcappdata package>
-	 This will replace the current contents of the container. If the app is currently running it will be terminated before the container is replaced.
-
-xcrun simctl help launch
-Launch an application by identifier on a device.
-Usage: simctl launch [-w | --wait-for-debugger] [--console|--console-pty] [--stdout=<path>] [--stderr=<path>] [--terminate-running-process] <device> <app bundle identifier> [<argv 1> <argv 2> ... <argv n>]
-
-	--console Block and print the application's stdout and stderr to the current terminal.
-		Signals received by simctl are passed through to the application.
-		(Cannot be combined with --stdout or --stderr)
-	--console-pty Block and print the application's stdout and stderr to the current terminal via a PTY.
-		Signals received by simctl are passed through to the application.
-		(Cannot be combined with --stdout or --stderr)
-	--stdout=<path> Redirect the application's standard output to a file.
-	--stderr=<path> Redirect the application's standard error to a file.
-	--terminate-running-process Terminate any running copy of the application.
-		Note: Log output is often directed to stderr, not stdout.
-
-If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
-
-xcrun simctl help terminate
-Terminate an application by identifier on a device.
-Usage: simctl terminate <device> <app bundle identifier>
-
-xcrun simctl help spawn
-Spawn a process by executing a given executable on a device.
-Usage: simctl spawn [-w | --wait-for-debugger] [-s | --standalone] [-a <arch> | --arch=<arch>] <device> <path to executable> [<argv 1> <argv 2> ... <argv n>]
-
-The path to the executable is searched using the following rules:
-   <path> contains no / characters: search the device's $PATH. This is similar to how most shells work, but searches the device's path instead of the host's path.
-   <path> starts with /: Assume a literal path to the binary. This must start from the host's root.
-   <path> contains non-leading / characters: search relative to the current directory first, then relative to the device's $SIMULATOR_ROOT.
-
-If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
-
-xcrun simctl help list
-List available devices, device types, runtimes, or device pairs.
-Usage: simctl list [-j | --json] [-v] [devices|devicetypes|runtimes|pairs] [<search term>|available]
--j     Print as JSON
--v     More verbose output
-
-Specify one of 'devices', 'devicetypes', 'runtimes', or 'pairs' to list only items of that type. If a type filter is specified you may also specify a search term. Search terms use a simple case-insensitive contains check against the item's description. You may use the search term 'available' to only list available items.
-
-
-xcrun simctl help icloud_sync
-Trigger iCloud sync on a device.
-Usage: simctl icloud_sync <device>
-
-xcrun simctl help pbsync
-Sync the pasteboard content from one pasteboard to another.
-Usage: simctl pbsync [-pv] <source device or "host"> <destination device or "host">
-
- -p causes simctl to use promise data for secondary types.  simctl will continue to run to provide that promise data until something else replaces it on the pasteboard.
-
-xcrun simctl help pbcopy
-Copy standard input onto the device pasteboard.
-Usage: simctl pbcopy [-v] <device or "host">
-
-xcrun simctl help pbpaste
-Print the contents of the device's pasteboard to standard output.
-Usage: simctl pbpaste [-v] <device or "host">
-
-xcrun simctl help help
-Prints the usage for a given subcommand.
-Usage: simctl help <subcommand>
-
-xcrun simctl help io
-Set up a device IO operation.
-Usage: simctl io <device> <operation> <arguments>
-
-Supported operations:
-	enumerate [--poll]
-	    Lists all available IO ports and descriptor states.
-	    --poll       Poll after enumeration.
-
-	poll
-	    Polls all available IO ports for events.
-
-	recordVideo [--codec=<codec>] [--display=<display>] [--mask=<policy>] [--force] <file or url>
-	    Records the display to a QuickTime movie at the specified file or url.
-	    --codec      Specifies the codec type: "h264" or "hevc". Default is "hevc".
-
-	    --display    iOS: supports "internal" or "external". Default is "internal".
-	                 tvOS: supports only "external"
-	                 watchOS: supports only "internal"
-
-	    --mask       For non-rectangular displays, handle the mask by policy:
-	                 ignored: The mask is ignored and the unmasked framebuffer is saved.
-	                 alpha: Not supported, but retained for compatibility; the mask is rendered black.
-	                 black: The mask is rendered black.
-
-	    --force      Force the output file to be written to, even if the file already exists.
-
-	screenshot [--type=<type>] [--display=<display>] [--mask=<policy>] <file or url>
-	    Saves a screenshot as a PNG to the specified file or url(use "-" for stdout).
-	    --type       Can be "png", "tiff", "bmp", "gif", "jpeg". Default is png.
-
-	    --display    iOS: supports "internal" or "external". Default is "internal".
-	                 tvOS: supports only "external"
-	                 watchOS: supports only "internal"
-
-	                 You may also specify a port by UUID
-	    --mask       For non-rectangular displays, handle the mask by policy:
-	                 ignored: The mask is ignored and the unmasked framebuffer is saved.
-	                 alpha: The mask is used as premultiplied alpha.
-	                 black: The mask is rendered black.
-
-Example:
-	Save a screenshot of the booted device to screenshot.png:
-	simctl io booted screenshot screenshot.png
-
 
 
 xcrun simctl help diagnose
@@ -290,6 +116,139 @@ NOTE: If there are booted devices only logs from those devices are collected by 
 NOTE: You can run 'simctl logverbose <device> enable' to enable verbose logging and reboot the device before reproducing the problem and running 'simctl diagnose'.
 
 
+xcrun simctl help erase
+Erase a device's contents and settings.
+Usage: simctl erase <device> [... <device n>] | all
+
+Specifying all will erase all existing devices.
+
+xcrun simctl help get_app_container
+Print the path of the installed app's container
+Usage: simctl get_app_container <device> <app bundle identifier> [<container>]
+
+container   Optionally specify the container. Defaults to app.
+  app                 The .app bundle
+  data                The application's data container
+  groups              The App Group containers
+  <group identifier>  A specific App Group container
+
+
+
+xcrun simctl help getenv
+Print an environment variable from a running device.
+Usage: simctl getenv <device> <variable name>
+
+xcrun simctl help help
+Prints the usage for a given subcommand.
+Usage: simctl help <subcommand>
+
+xcrun simctl help icloud_sync
+Trigger iCloud sync on a device.
+Usage: simctl icloud_sync <device>
+
+xcrun simctl help install
+Install an app on a device.
+Usage: simctl install <device> <path>
+
+xcrun simctl help install_app_data
+Install an xcappdata package to a device, replacing the current contents of the container.
+Usage: simctl install_app_data <device> <path to xcappdata package>
+	 This will replace the current contents of the container. If the app is currently running it will be terminated before the container is replaced.
+
+xcrun simctl help io
+Set up a device IO operation.
+Usage: simctl io <device> <operation> <arguments>
+
+Supported operations:
+	enumerate [--poll]
+	    Lists all available IO ports and descriptor states.
+	    --poll       Poll after enumeration.
+
+	poll
+	    Polls all available IO ports for events.
+
+	recordVideo [--codec=<codec>] [--display=<display>] [--mask=<policy>] [--force] <file or url>
+	    Records the display to a QuickTime movie at the specified file or url.
+	    --codec      Specifies the codec type: "h264" or "hevc". Default is "hevc".
+
+	    --display    iOS: supports "internal" or "external". Default is "internal".
+	                 tvOS: supports only "external"
+	                 watchOS: supports only "internal"
+
+	    --mask       For non-rectangular displays, handle the mask by policy:
+	                 ignored: The mask is ignored and the unmasked framebuffer is saved.
+	                 alpha: Not supported, but retained for compatibility; the mask is rendered black.
+	                 black: The mask is rendered black.
+
+	    --force      Force the output file to be written to, even if the file already exists.
+
+	simctl writes 'Recording started' to stderr once the first video frame has been processed. Look for this
+	if you want to wait for the recording to start.
+	Send SIGINT (Control + C) to stop recording. simctl exits once the in-flight frames are processed
+	and the video file is finalized.
+
+	screenshot [--type=<type>] [--display=<display>] [--mask=<policy>] <file or url>
+	    Saves a screenshot as a PNG to the specified file or url(use "-" for stdout).
+	    --type       Can be "png", "tiff", "bmp", "gif", "jpeg". Default is png.
+
+	    --display    iOS: supports "internal" or "external". Default is "internal".
+	                 tvOS: supports only "external"
+	                 watchOS: supports only "internal"
+
+	                 You may also specify a port by UUID
+	    --mask       For non-rectangular displays, handle the mask by policy:
+	                 ignored: The mask is ignored and the unmasked framebuffer is saved.
+	                 alpha: The mask is used as premultiplied alpha.
+	                 black: The mask is rendered black.
+
+Example:
+	Save a screenshot of the booted device to screenshot.png:
+	simctl io booted screenshot screenshot.png
+
+
+
+xcrun simctl help keychain
+Manipulate a device's keychain
+Usage: simctl keychain <device> <action> [arguments]
+
+    add-root-cert [path]
+        Add a certificate to the trusted root store.
+
+    add-cert [path]
+        Add a certificate to the keychain.
+
+    reset
+        Reset the keychain.
+
+
+
+xcrun simctl help launch
+Launch an application by identifier on a device.
+Usage: simctl launch [-w | --wait-for-debugger] [--console|--console-pty] [--stdout=<path>] [--stderr=<path>] [--terminate-running-process] <device> <app bundle identifier> [<argv 1> <argv 2> ... <argv n>]
+
+	--console Block and print the application's stdout and stderr to the current terminal.
+		Signals received by simctl are passed through to the application.
+		(Cannot be combined with --stdout or --stderr)
+	--console-pty Block and print the application's stdout and stderr to the current terminal via a PTY.
+		Signals received by simctl are passed through to the application.
+		(Cannot be combined with --stdout or --stderr)
+	--stdout=<path> Redirect the application's standard output to a file.
+	--stderr=<path> Redirect the application's standard error to a file.
+	--terminate-running-process Terminate any running copy of the application.
+		Note: Log output is often directed to stderr, not stdout.
+
+If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
+
+xcrun simctl help list
+List available devices, device types, runtimes, or device pairs.
+Usage: simctl list [-j | --json] [-e | --no-escape-slashes] [-v] [devices|devicetypes|runtimes|pairs] [<search term>|available]
+-j     Print as JSON
+-e     Encode slashes without escapes in JSON output
+-v     More verbose output
+
+Specify one of 'devices', 'devicetypes', 'runtimes', or 'pairs' to list only items of that type. If a type filter is specified you may also specify a search term. Search terms use a simple case-insensitive contains check against the item's description. You may use the search term 'available' to only list available items.
+
+
 xcrun simctl help logverbose
 enable or disable verbose logging for a device
 Usage: simctl logverbose [<device>] (enable | disable)
@@ -299,6 +258,108 @@ Usage: simctl logverbose [<device>] (enable | disable)
 
 NOTE: You may need to reboot the affected device before logging changes will be effective.
 
+
+xcrun simctl help openurl
+Open a URL in a device.
+Usage: simctl openurl <device> <URL>
+
+xcrun simctl help pair
+Create a new watch and phone pair.
+Usage: simctl pair <watch device> <phone device>
+
+xcrun simctl help pair_activate
+Set a given pair as active.
+Usage: simctl pair_activate <pair>
+
+xcrun simctl help pbcopy
+Copy standard input onto the device pasteboard.
+Usage: simctl pbcopy [-v] <device or "host">
+
+xcrun simctl help pbpaste
+Print the contents of the device's pasteboard to standard output.
+Usage: simctl pbpaste [-v] <device or "host">
+
+xcrun simctl help pbsync
+Sync the pasteboard content from one pasteboard to another.
+Usage: simctl pbsync [-pv] <source device or "host"> <destination device or "host">
+
+ -p causes simctl to use promise data for secondary types.  simctl will continue to run to provide that promise data until something else replaces it on the pasteboard.
+
+xcrun simctl help privacy
+Grant, revoke, or reset privacy and permissions
+Usage: simctl privacy <device> <action> <service> [<bundle identifier>]
+
+	action
+	     The action to take:
+	         grant - Grant access without prompting. Requires bundle identifier.
+	         revoke - Revoke access, denying all use of the service. Requires bundle identifier.
+	         reset - Reset access, prompting on next use. Bundle identifier optional.
+	     Some permission changes will terminate the application if running.
+	service
+	     The service:
+	         all - Apply the action to all services.
+	         calendar - Allow access to calendar.
+	         contacts-limited - Allow access to basic contact info.
+	         contacts - Allow access to full contact details.
+	         location - Allow access to location services when app is in use.
+	         location-always - Allow access to location services at all times.
+	         photos-add - Allow adding photos to the photo library.
+	         photos - Allow full access to the photo library.
+	         media-library - Allow access to the media library.
+	         microphone - Allow access to audio input.
+	         motion - Allow access to motion and fitness data.
+	         reminders - Allow access to reminders.
+	         siri - Allow use of the app with Siri.
+	bundle identifier
+	     The bundle identifier of the target application.
+
+Examples:
+	reset all permissions: privacy <device> reset all
+	grant test host photo permissions: privacy <device> grant photos com.example.app.test-host
+
+Warning:
+Normally applications must have valid Info.plist usage description keys and follow the API guidelines to request access to services. Using this command to bypass those requirements can mask bugs.
+
+
+
+xcrun simctl help push
+Send a simulated push notification
+Usage: simctl push <device> [<bundle identifier>] (<json file> | -)
+
+	bundle identifier
+	     The bundle identifier of the target application
+	     If the payload file contains a 'Simulator Target Bundle' top-level key this parameter may be omitted.
+	     If both are provided this argument will override the value from the payload.
+	json file
+	     Path to a JSON payload or '-' to read from stdin. The payload must:
+	       - Contain an object at the top level.
+	       - Contain an 'aps' key with valid Apple Push Notification values.
+	       - Be 4096 bytes or less.
+
+Only application remote push notifications are supported. VoIP, Complication, File Provider, and other types are not supported.
+
+
+
+xcrun simctl help rename
+Rename a device.
+Usage: simctl rename <device> <name>
+
+xcrun simctl help shutdown
+Shutdown a device.
+Usage: simctl shutdown <device> | all
+
+Specifying all will shut down all running devices
+
+xcrun simctl help spawn
+Spawn a process by executing a given executable on a device.
+Usage: simctl spawn [-w | --wait-for-debugger] [-s | --standalone] [-a <arch> | --arch=<arch>] <device> <path to executable> [<argv 1> <argv 2> ... <argv n>]
+
+The path to the executable is searched using the following rules:
+   <path> contains no / characters: search the device's $PATH. This is similar to how most shells work, but searches the device's path instead of the host's path.
+   <path> starts with /: Assume a literal path to the binary. This must start from the host's root.
+   <path> contains non-leading / characters: search relative to the current directory first, then relative to the device's $SIMULATOR_ROOT.
+
+If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
 
 xcrun simctl help status_bar
 Set or clear status bar overrides
@@ -319,7 +380,7 @@ Supported Operations:
 	     Set the date or time to a fixed value.
 	     If the string is a valid ISO date string it will also set the date on relevant devices.
 	--dataNetwork <dataNetworkType>
-	     If specified must be one of 'hide', 'wifi', '3g', '4g', 'lte', 'lte-a', 'lte+', '5g', '5g+', or '5g-uwb'.
+	     If specified must be one of 'hide', 'wifi', '3g', '4g', 'lte', 'lte-a', 'lte+', '5g', '5g+', '5g-uwb', or '5g-uc'.
 	--wifiMode <mode>
 	     If specified must be one of 'searching', 'failed', or 'active'.
 	--wifiBars <int>
@@ -336,6 +397,10 @@ Supported Operations:
 	     If specified must be 0-100.
 
 
+
+xcrun simctl help terminate
+Terminate an application by identifier on a device.
+Usage: simctl terminate <device> <app bundle identifier>
 
 xcrun simctl help ui
 Get or Set UI options
@@ -381,75 +446,17 @@ Supported Options:
 
 
 
-xcrun simctl help push
-Send a simulated push notification
-Usage: simctl push <device> [<bundle identifier>] (<json file> | -)
+xcrun simctl help uninstall
+Uninstall an app from a device.
+Usage: simctl uninstall <device> <app bundle identifier>
 
-	bundle identifier
-	     The bundle identifier of the target application
-	     If the payload file contains a 'Simulator Target Bundle' top-level key this parameter may be omitted.
-	     If both are provided this argument will override the value from the payload.
-	json file
-	     Path to a JSON payload or '-' to read from stdin. The payload must:
-	       - Contain an object at the top level.
-	       - Contain an 'aps' key with valid Apple Push Notification values.
-	       - Be 4096 bytes or less.
+xcrun simctl help unpair
+Unpair a watch and phone pair.
+Usage: simctl unpair <pair UUID>
 
-Only application remote push notifications are supported. VoIP, Complication, File Provider, and other types are not supported.
-
-
-
-xcrun simctl help privacy
-Grant, revoke, or reset privacy and permissions
-Usage: simctl privacy <device> <action> <service> [<bundle identifier>]
-
-	action
-	     The action to take:
-	         grant - Grant access without prompting. Requires bundle identifier.
-	         revoke - Revoke access, denying all use of the service. Requires bundle identifier.
-	         reset - Reset access, prompting on next use. Bundle identifier optional.
-	     Some permission changes will terminate the application if running.
-	service
-	     The service:
-	         all - Apply the action to all services.
-	         calendar - Allow access to calendar.
-	         contacts-limited - Allow access to basic contact info.
-	         contacts - Allow access to full contact details.
-	         location - Allow access to location services when app is in use.
-	         location-always - Allow access to location services at all times.
-	         photos-add - Allow adding photos to the photo library.
-	         photos - Allow full access to the photo library.
-	         media-library - Allow access to the media library.
-	         microphone - Allow access to audio input.
-	         motion - Allow access to motion and fitness data.
-	         reminders - Allow access to reminders.
-	         siri - Allow use of the app with Siri.
-	bundle identifier
-	     The bundle identifier of the target application.
-
-Examples:
-	reset all permissions: privacy <device> reset all
-	grant test host photo permissions: privacy <device> grant photos com.example.app.test-host
-
-Warning:
-Normally applications must have valid Info.plist usage description keys and follow the API guidelines to request access to services. Using this command to bypass those requirements can mask bugs.
-
-
-
-xcrun simctl help keychain
-Manipulate a device's keychain
-Usage: simctl keychain <device> <action> [arguments]
-
-    add-root-cert [path]
-        Add a certificate to the trusted root store.
-
-    add-cert [path]
-        Add a certificate to the keychain.
-
-    reset
-        Reset the keychain.
-
-
+xcrun simctl help upgrade
+Upgrade a device to a newer runtime.
+Usage: simctl upgrade <device> <runtime id>
 
 xcrun simctl help addphoto
 Add photos to the photo library of a device.
@@ -530,33 +537,16 @@ commands:
 	See darwinup usage for additional commands and more information.
 
 NOTE: If you install or uninstall roots, you must manually update the dyld_sim shared cache.
-      See simctl help runtime for information about triggering a dyld_sim shared cache rebuild.
+      See simctl help legacyruntime for information about triggering a dyld_sim shared cache rebuild.
 
 
-xcrun simctl help disk
-Perform disk operations, like simulating volume unmount.
-Usage: simctl disk <operation> <arguments>
 
-Supported Operations:
-	mount <path>
-	     Simulate mounting the given path. This will look for runtime profiles in a mountable disk image.
-	     The path will automatically be truncated to the root of the volume that contains it.
-	     As a special exception, if the path contains 'Xcode{-beta}.app it will also register that Xcode's developer
-	     directory with CoreSimulator as if a client had done so.
-	unmount <path>
-	     Simulate unmounting the given path. This can  be a mountable disk image path or volume containing Xcode.
-	     The path will automatically be truncated to the root of the volume that contains it.
-	     Any booted simulators using profiles on this volume will be shutdown. Any profiles on this volume will
-	     become unavailable.
-Note: The path you pass must be to an unmountable volume. Passing '/' is not supported.
-
-
-xcrun simctl help runtime
+xcrun simctl help legacyruntime
 Locate, copy, mount, and unmount simulator runtime disk images.
-Usage: simctl runtime <operation> <arguments>
+Usage: simctl legacyruntime <operation> <arguments>
 
 Supported Operations:
-    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--max-cache-size <size>] [--cache-path <path>] [--mountpoint <mount location>]
+    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--max-cache-size <size>] [--cache-path <path>]
 	Locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator.
 
 	--internal
@@ -605,8 +595,10 @@ Supported Operations:
     pin <device> [--latest | --build <train-version> | --path <path to runtime>]
 	Pin a device to use a specific runtime.
 
-	--latest
-	     (Default) Use the latest build of the major.minor.revision runtime.
+	--system
+	     (Default) Use the system policy. Customer OS: match SDK build if possible. All others use latest.
+	--newest
+	     Always use the newest build matching the semantic version.
 	--build <train-version>
 	     Pin the device to use a specific build of the runtime. If multiple runtimes match one is randomly chosen.
 	--path <path to runtime>
@@ -644,8 +636,6 @@ Unless a simulated device specifies an explicit build, it will boot with the new
 For example if a device was created with iOS 12.0, it will prefer the newest build of iOS 12.0 it can find. You can have as many builds of iOS 12 mounted
 as you like, but only devices pinned to a runtime will use any other build besides the latest. To change an existing device's pinning
 use pin (see above).
-To create a device pre-pinned to a runtime specify the runtime as a path to the mounted volume rather than an identifier, eg:
-  simctl create <name> <devicetype> /Volumes/Example10A101
 Other commands that take a runtime identifier (such as simctl darwinup) also accept a <train-version> or path to the disk image mount point, so long as you specify
 enough information to uniquely identify a single runtime. If the specifier is ambiguous simctl will error rather than making any assumptions.
 

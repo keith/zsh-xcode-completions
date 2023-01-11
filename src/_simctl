@@ -60,8 +60,7 @@ _commands() {
     'listapps:show the installed applications'
     'bootstatus:Checks device boot status.'
     'darwinup:Invoke darwinup to install a root for the specified simulator runtime.'
-    'disk:Perform disk operations, like simulating volume unmount.'
-    'runtime:Locate, copy, mount, and unmount simulator runtime disk images.'
+    'legacyruntime:Locate, copy, mount, and unmount simulator runtime disk images.'
     'reset:reset a given archive or database'
   )
   _describe subcommand commands
@@ -114,6 +113,7 @@ _options() {
     (boot)
       _arguments \
         ': :{FILTER=available_shutdown _devices; _pairs}' \
+        '--arch=-[specify the architecture to use when booting the simulator]:arch:(arm64 x86_64)' \
         '--disabledJob=-[disables the given launchd job]' \
         '--enabledJob=-[enables the given launchd job when it would normally be disabled]'
       ;;
@@ -205,6 +205,7 @@ _options() {
     (list)
       _arguments \
         '(-j --json)'{-j,--json}'[print as JSON]' \
+        '(-e --no-escape-slashes)'{-e,--no-escape-slashes}'[encode slashes without escapes in JSON output]' \
         '-v[more verbose output]' \
         ':list:(devices devicetypes runtimes pairs)' \
         '::search term:(available)'
@@ -354,16 +355,10 @@ _options() {
         ':command:(install list uninstall)'
       ;;
 
-    (disk)
+    (legacyruntime)
       _arguments \
-        ':operation:(mount unmount)' \
-        ':path:_files'
-      ;;
-
-    (runtime)
-      _arguments \
-        ': :_runtime_operations' \
-        '*:: :_runtime_arguments'
+        ': :_legacyruntime_operations' \
+        '*:: :_legacyruntime_arguments'
       ;;
 
     (reset)
@@ -461,7 +456,7 @@ _status_bar_arguments() {
     (override)
       _arguments \
 	'--time=:string or ISO date:' \
-        '--dataNetwork=:type:(hide wifi 3g 4g lte lte-a lte+ 5g 5g+ 5g-uwb)' \
+        '--dataNetwork=:type:(hide wifi 3g 4g lte lte-a lte+ 5g 5g+ 5g-uwb 5g-uc)' \
         '--wifiMode=:mode:(searching failed active)' \
         '--wifiBars=:number:(0 1 2 3)' \
         '--cellularMode=:mode:(notSupported searching failed  active)' \
@@ -558,7 +553,7 @@ _keychain_arguments() {
   esac
 }
 
-_runtime_operations() {
+_legacyruntime_operations() {
   local -a operations
   operations=(
     'mount:locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator'
@@ -572,7 +567,7 @@ _runtime_operations() {
   _describe operation operations
 }
 
-_runtime_arguments() {
+_legacyruntime_arguments() {
   case $line[1] in
 
     (mount)
@@ -587,7 +582,6 @@ _runtime_arguments() {
         '--print-only[print the path to the image on the network but take no other action]' \
         '--max-cache-size:size:' \
         '--cache-path:path:_files' \
-        '--mountpoint:mount location:_files' \
         '--no-sparse' \
         '--use-nfs'
       ;;
@@ -608,9 +602,10 @@ _runtime_arguments() {
     (pin)
       _arguments \
         ': :_devices' \
-        '(--build --path)--latest[(default) use the latest build of the major.minor.revision runtime]' \
-        '(--latest --path)--build[pin the device to use a specific build of the runtime]:train-version:' \
-        '(--latest --build)--path[pin the device to use a specific runtime by path]:path to runtime:_files'
+        '(--newest --build --path)--system[(default) use the system policy; customer OS: match SDK build if possible; all others use latest]' \
+        '(--system --build --path)--newest[always use the newest build matching the semantic version]' \
+        '(--system --newest --path)--build[pin the device to use a specific build of the runtime]:train-version:' \
+        '(--system --newest --build)--path[pin the device to use a specific runtime by path]:path to runtime:_files'
       ;;
 
     (info)
