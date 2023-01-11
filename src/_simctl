@@ -47,21 +47,21 @@ _commands() {
     'push:send a simulated push notification'
     'privacy:grant, revoke, or reset privacy and permissions'
     'keychain:manipulate a device'"'"'s keychain'
-    'addphoto:Add photos to the photo library of a device.'
-    'addvideo:Add videos to the photo library of a device.'
-    'pbinfo:Print information about the device'"'"'s pasteboard'
-    'notify_post:Post a darwin notification on a device.'
-    'notify_get_state:Get the state value of a darwin notification on a device.'
-    'notify_set_state:Set the state value of a darwin notification on a device.'
-    'register:Register a service from one bootstrap into another.'
-    'unregister:Unregister a service from a device'"'"'s bootstrap.'
-    'keyboard:Set the device'"'"'s keyboard language.'
-    'monitor:List notifications as they arrive.'
-    'appinfo:Show information about an installed application.'
+    'addphoto:add photos to the photo library of a device'
+    'addvideo:add videos to the photo library of a device'
+    'pbinfo:print information about the device'"'"'s pasteboard'
+    'notify_post:post a darwin notification on a device'
+    'notify_get_state:get the state value of a darwin notification on a device'
+    'notify_set_state:set the state value of a darwin notification on a device'
+    'register:register a service from one bootstrap into another'
+    'unregister:unregister a service from a device'"'"'s bootstrap'
+    'keyboard:set the device'"'"'s keyboard language'
+    'monitor:list notifications as they arrive'
+    'appinfo:show information about an installed application'
     'listapps:show the installed applications'
-    'bootstatus:Checks device boot status.'
-    'darwinup:Invoke darwinup to install a root for the specified simulator runtime.'
-    'legacyruntime:Locate, copy, mount, and unmount simulator runtime disk images.'
+    'bootstatus:checks device boot status'
+    'darwinup:invoke darwinup to install a root for the specified simulator runtime'
+    'legacyruntime:locate, copy, mount, and unmount simulator runtime disk images'
     'reset:reset a given archive or database'
   )
   _describe subcommand commands
@@ -606,7 +606,7 @@ _legacyruntime_operations() {
   local -a operations
   operations=(
     'mount:locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator'
-    'unmount:Unmount the Simulator Runtime if it is mounted'
+    'unmount:unmount the Simulator Runtime if it is mounted'
     'cache'
     'pin:pin a device to use a specific runtime'
     'info'
@@ -643,8 +643,8 @@ _legacyruntime_arguments() {
 
     (cache)
       _arguments \
-        ': :_runtime_cache_commands' \
-        '*:: :_runtime_cache_arguments' \
+        ': :_legacyruntime_cache_commands' \
+        '*:: :_legacyruntime_cache_arguments' \
         '--cache_path:path:_files'
       ;;
 
@@ -659,8 +659,8 @@ _legacyruntime_arguments() {
 
     (info)
       _arguments \
-        ': :_runtime_info_commands' \
-        '*:: :_runtime_info_arguments'
+        ': :_legacyruntime_info_commands' \
+        '*:: :_legacyruntime_info_arguments'
       ;;
 
     (update_dyld_shared_cache|remove_dyld_shared_cache)
@@ -671,7 +671,7 @@ _legacyruntime_arguments() {
   esac
 }
 
-_runtime_cache_commands() {
+_legacyruntime_cache_commands() {
   local -a commands
   commands=(
     'list:lists cached runtime disk images'
@@ -680,7 +680,7 @@ _runtime_cache_commands() {
   _describe command commands
 }
 
-_runtime_cache_arguments() {
+_legacyruntime_cache_arguments() {
   case $line[1] in
 
     (clear)
@@ -694,7 +694,7 @@ _runtime_cache_arguments() {
     '--cache-path:path:_files'
 }
 
-_runtime_info_commands() {
+_legacyruntime_info_commands() {
   local -a commands
   commands=(
     'path:lists the path to the runtime'
@@ -702,7 +702,7 @@ _runtime_info_commands() {
   _describe command commands
 }
 
-_runtime_info_arguments() {
+_legacyruntime_info_arguments() {
   case $line[1] in
 
     (path)

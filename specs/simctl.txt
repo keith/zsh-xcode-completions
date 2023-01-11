@@ -287,7 +287,7 @@ Latitude and longitude pairs must be specified using '.' as the decimal separato
 
 xcrun simctl help logverbose
 enable or disable verbose logging for a device
-Usage: simctl logverbose [<device>] (set)
+Usage: simctl logverbose [<device>] (enable | disable)
 	<device>         The device. If not provided all booted devices are affected.
 	enable           Enables verbose logging
 	disable          Disables verbose logging
@@ -574,7 +574,6 @@ commands:
 
 NOTE: If you install or uninstall roots, you must manually update the dyld_sim shared cache.
       See simctl help legacyruntime for information about triggering a dyld_sim shared cache rebuild.
-
 
 
 xcrun simctl help legacyruntime
