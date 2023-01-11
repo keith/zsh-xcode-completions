@@ -26,6 +26,7 @@ Subcommands:
 	keychain            Manipulate a device's keychain
 	launch              Launch an application by identifier on a device.
 	list                List available devices, device types, runtimes, or device pairs.
+	location            Control a device's simulated location
 	logverbose          enable or disable verbose logging for a device
 	openurl             Open a URL in a device.
 	pair                Create a new watch and phone pair.
@@ -249,9 +250,44 @@ Usage: simctl list [-j | --json] [-e | --no-escape-slashes] [-v] [devices|device
 Specify one of 'devices', 'devicetypes', 'runtimes', or 'pairs' to list only items of that type. If a type filter is specified you may also specify a search term. Search terms use a simple case-insensitive contains check against the item's description. You may use the search term 'available' to only list available items.
 
 
+xcrun simctl help location
+Control a device's simulated location
+Usage: simctl location <device> <action> [arguments]
+
+    list
+        List available simulation scenarios.
+
+    clear
+        Stop any running scenario and clear any simulated location.
+
+    set <lat1>,<lon1>
+        Set the location to a specific latitude and longitude.
+
+    run <scenario>
+        Run a simulated location scenario (use the list action to get a list of scenarios).
+
+    start [--speed=<meters/sec>] [--distance=<meters per second>|--interval=<seconds>] <lat1>,<lon1> <latN>,<lonN>...
+        Set the location to a series of waypoints specified as 'lat,lon' pairs, interpolating between them over time.
+        At least two waypoints are required. Use '-' to read waypoints from stdin, one waypoint per line.
+
+        Speed specifies how quickly to move between waypoints in meters per second. If not specified 20m/s is used.
+
+        The system will issue location updates along the path between each pair of waypoints. Use distance or interval to 
+        control how often those updates are issued. Distance will issue an update every <meters> travelled without regard
+        for the time between updates. Interval will issue updates at fixed times without regard for how much
+        the location moves between updates.
+        If neither are specified an interval of 1.0 seconds is used. If both are specified the system picks ones.
+
+        Example simulating a direct line between San Francisco and New York City, with updates every km:
+          set --distance=1000 --speed=260 37.629538,-122.395733 40.628083,-73.768254
+
+Latitude and longitude pairs must be specified using '.' as the decimal separator and ',' as the field separator.
+
+
+
 xcrun simctl help logverbose
 enable or disable verbose logging for a device
-Usage: simctl logverbose [<device>] (enable | disable)
+Usage: simctl logverbose [<device>] (set)
 	<device>         The device. If not provided all booted devices are affected.
 	enable           Enables verbose logging
 	disable          Disables verbose logging

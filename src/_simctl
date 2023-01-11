@@ -33,6 +33,7 @@ _commands() {
     'terminate:terminate an application by identifier on a device'
     'spawn:spawn a process by executing a given executable on a device'
     'list:list available devices, device types, runtimes, or device pairs'
+    'location:control a device'"'"'s simulated location'
     'icloud_sync:trigger iCloud sync on a device'
     'pbsync:sync the pasteboard content from one pasteboard to another'
     'pbcopy:copy standard input onto the device pasteboard'
@@ -211,6 +212,12 @@ _options() {
         '::search term:(available)'
       ;;
 
+    (location)
+      _arguments \
+        ': :{FILTER=booted _devices}' \
+        '*:: :_location'
+      ;;
+
     (icloud_sync|listapps)
       _arguments \
         ': :{FILTER=booted _devices}'
@@ -365,6 +372,48 @@ _options() {
       _arguments \
         ': :_devices' \
         ':subsystem:(launch_services)'
+      ;;
+
+  esac
+}
+
+_location() {
+  _arguments \
+    ': :_location_actions' \
+    '*:: :_location_arguments'
+}
+
+_location_actions() {
+  local -a actions
+  actions=(
+    'list:list available simulation scenarios'
+    'clear:stop any running scenario and clear any simulated location'
+    'set:set the location to a specific latitude and longitude'
+    'run:run a simulated location scenario (use the list action to get a list of scenarios)'
+    'start:set the location to a series of waypoints'
+  )
+  _describe action actions
+}
+
+_location_arguments() {
+  case $line[1] in
+
+    (set)
+      _arguments \
+        ':lat1,lon1:'
+      ;;
+
+    (run)
+      _arguments \
+        ':scenario:'
+      ;;
+
+    (start)
+      _arguments \
+        '--speed=-:meters/sec:' \
+        '(--interval)--distance=-:meters per second:' \
+        '(--distance)--interval=-:seconds:' \
+        '*::latN,lonN:'
       ;;
 
   esac
