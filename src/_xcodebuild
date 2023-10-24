@@ -53,7 +53,6 @@ _actions() {
 
 _arguments \
   '(-n -dry-run)'{-n,-dry-run}'[Print but do not execute commands]' \
-  '*: :->actions' \
   '-alltargets[Build all targets in the specified project]' \
   '-arch[Architecture to build]:Architecture to build:->archs' \
   '-archivePath[Archive Path]:Archive Path:_directories' \
@@ -83,12 +82,10 @@ _arguments \
   '-usage[Display xcodebuild usage]' \
   '-version[Prints Xcode version]' \
   '-workspace[xcworkspace file]:xcworkspace:->workspaces' \
-  '-xcconfig[xcconfig file]:xcconfig:->xcconfigs'
+  '-xcconfig[xcconfig file]:xcconfig:->xcconfigs' \
+  '*:Build action:_actions'
 
 case "$state" in
-  actions)
-    _actions
-    ;;
   archs)
     archs=($(_archs))
     if [[ $archs != "" ]]; then
