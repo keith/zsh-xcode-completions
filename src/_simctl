@@ -201,10 +201,9 @@ _options() {
 
     (spawn)
       _arguments \
-        '(-w --wait-for-debugger)'{-w,--wait-for-debugger} \
-        '(-s --standalone)'{-s,--standalone} \
-        '(--arch)-a:arch:' \
-        '(-a)--arch=-:arch:' \
+        '(-w --wait-for-debugger)'{-w,--wait-for-debugger}'[start the process suspended]' \
+        '(-s --standalone)'{-s,--standalone}'[use a NULL mach bootstrap port, meaning the process cannot connect to other services and does not require a booted device (deprecated)]' \
+        '(-a --arch)'{-a,--arch}'[specify an architecture to use when spawning a universal binary]:arch:(x86_64 arm64)' \
         '(-): :{FILTER=booted _devices}' \
         ':path:_files' \
         '*::argv:'
@@ -719,6 +718,8 @@ _legacyruntime_arguments() {
         '(--customer)--internal[(default) select the internal runtime]' \
         '(--internal)--customer[select the customer (public) runtime]' \
         '--writable[when mounting the disk image, do not use a shadow file: directly mount the image as writable]'  \
+        '(--use-existing)--use-nfs[copy image from NFS]' \
+        '(--use-nfs)--use-existing[use image specified at the provided path]:path:_files' \
         '--no-mount[copy the image to the cache (if not present), but do not actually mount it]' \
         '--no-copy' \
         '--print-only[print the path to the image on the network but take no other action]' \
@@ -758,7 +759,7 @@ _legacyruntime_arguments() {
 
     (update_dyld_shared_cache|remove_dyld_shared_cache)
       _arguments \
-        '::platform or train-build:_files'
+        '::platform or train-build or path:_files'
       ;;
 
   esac

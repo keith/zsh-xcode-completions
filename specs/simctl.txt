@@ -280,7 +280,7 @@ Usage: simctl location <device> <action> [arguments]
         If neither are specified an interval of 1.0 seconds is used. If both are specified the system picks ones.
 
         Example simulating a direct line between San Francisco and New York City, with updates every km:
-          set --distance=1000 --speed=260 37.629538,-122.395733 40.628083,-73.768254
+          start --distance=1000 --speed=260 37.629538,-122.395733 40.628083,-73.768254
 
 Latitude and longitude pairs must be specified using '.' as the decimal separator and ',' as the field separator.
 
@@ -310,11 +310,11 @@ Usage: simctl pair_activate <pair>
 
 xcrun simctl help pbcopy
 Copy standard input onto the device pasteboard.
-Usage: simctl pbcopy [-v] <device or "host">
+Usage: simctl pbcopy [-v] <device>
 
 xcrun simctl help pbpaste
 Print the contents of the device's pasteboard to standard output.
-Usage: simctl pbpaste [-v] <device or "host">
+Usage: simctl pbpaste [-v] <device>
 
 xcrun simctl help pbsync
 Sync the pasteboard content from one pasteboard to another.
@@ -457,6 +457,9 @@ Specifying all will shut down all running devices
 xcrun simctl help spawn
 Spawn a process by executing a given executable on a device.
 Usage: simctl spawn [-w | --wait-for-debugger] [-s | --standalone] [-a <arch> | --arch=<arch>] <device> <path to executable> [<argv 1> <argv 2> ... <argv n>]
+-w    Start the process suspended.
+-s    Use a NULL mach bootstrap port, meaning the process cannot connect to other services and does not require a booted device. (deprecated)
+-a    Specify an architecture (x86_64 or arm64) to use when spawning a universal binary.
 
 The path to the executable is searched using the following rules:
    <path> contains no / characters: search the device's $PATH. This is similar to how most shells work, but searches the device's path instead of the host's path.
@@ -649,7 +652,7 @@ Locate, copy, mount, and unmount simulator runtime disk images.
 Usage: simctl legacyruntime <operation> <arguments>
 
 Supported Operations:
-    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--max-cache-size <size>] [--cache-path <path>]
+    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--use-nfs | --use-existing <path>] [--max-cache-size <size>] [--cache-path <path>]
 	Locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator.
 
 	--internal
@@ -669,6 +672,8 @@ Supported Operations:
 	     NOTE: You don't want this.
 	--use-nfs
 	     By default images are downloaded from NFA. If this is passed in, the image is copied from NFS instead. Note that newer images (as of SkyB) are no longer available via NFS.
+	--use-existing <path>
+	     By default images are downloaded from NFA. If this is passed in, the image specified at the provided path will be used instead of downloading one.
 	--no-mount
 	     Copy the image to the cache (if not present), but do not actually mount it. Prints the path of the image as the last line of output.
 	--print-only
@@ -715,7 +720,7 @@ Supported Operations:
 	     Platform may be iOS, tvOS, or watchOS to select the relevant Xcode-bundled runtime.
 
 
-    update_dyld_shared_cache (<platform> | <train-build>)
+    update_dyld_shared_cache (<platform> | <train-build> | <path>)
 	Update the dyld shared cache for a specific runtime.
 
 
