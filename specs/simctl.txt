@@ -1,3 +1,5 @@
+@(#)PROGRAM:simctl  PROJECT:CoreSimulator-1171.7
+
 xcrun simctl || true
 usage: simctl [--set <path>] [--profiles <path>] <subcommand> ...
        simctl help [subcommand]
@@ -10,6 +12,7 @@ will choose one of them.
 
 Subcommands:
 	addmedia            Add photos, live photos, videos, or contacts to the library of a device.
+	appinfo             Show information about an installed application.
 	boot                Boot a device or device pair.
 	clone               Clone an existing device.
 	create              Create a new device.
@@ -26,6 +29,7 @@ Subcommands:
 	keychain            Manipulate a device's keychain
 	launch              Launch an application by identifier on a device.
 	list                List available devices, device types, runtimes, or device pairs.
+	listapps            Show the installed applications.
 	location            Control a device's simulated location
 	logverbose          enable or disable verbose logging for a device
 	openurl             Open a URL in a device.
@@ -34,8 +38,10 @@ Subcommands:
 	pbcopy              Copy standard input onto the device pasteboard.
 	pbpaste             Print the contents of the device's pasteboard to standard output.
 	pbsync              Sync the pasteboard content from one pasteboard to another.
+	personalization     Provides utility when working with personalization manifests
 	privacy             Grant, revoke, or reset privacy and permissions
 	push                Send a simulated push notification
+	reboot              Reboot a device.
 	rename              Rename a device.
 	runtime             Perform operations on runtimes
 	shutdown            Shutdown a device.
@@ -57,14 +63,19 @@ You can also specify multiple live photos by providing the photo and video files
 
 Contacts support the vCard format.
 
+xcrun simctl help appinfo
+Show information about an installed application.
+Usage: simctl appinfo <device> <bundle identifier>
+
 xcrun simctl help boot
 Boot a device or device pair.
-Usage: simctl boot <device> [--arch=<arch>] [--disabledJob=<job>] [--enabledJob=<job>]
+Usage: simctl boot <device> [--arch=<arch>] [--disabledJob=<job>] [--enabledJob=<job>] [--checked-allocations]
 
 	--arch=<arch>           Specify the architecture to use when booting the simulator (eg: 'arm64' or 'x86_64')
 	--disabledJob=<job>     Disables the given launchd job. Multiple jobs can be disabled by passing multiple flags.
 	--enabledJob=<job>      Enables the given launchd job when it would normally be disabled.
 	                        Multiple jobs can be enabled by passing multiple flags.
+	--checked-allocations   Spawn all processes during this boot session with checked allocations enabled (if supported).
 
 
 If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
@@ -161,6 +172,16 @@ xcrun simctl help io
 Set up a device IO operation.
 Usage: simctl io <device> <operation> <arguments>
 
+Common arguments:
+	    --display    Specifies which display to record. Accepts:
+	                 - Screen ID (eg: "1") 
+	                 - Screen name (eg: "Internal-1")
+	                 - Screen device name (eg: "primary")
+	                 - Screen UUID (eg: "D5293DAA-4D8C-453E-B049-969FE81936A0")
+	                 - Port UUID (eg: "D5293DAA-4D8C-453E-B049-969FE81936A0"
+	                 - Alias (for compatibility): "internal" or "external"
+	                 Use 'simctl io <device> enumerate' to list available screens and their IDs.
+
 Supported operations:
 	enumerate [--poll]
 	    Lists all available IO ports and descriptor states.
@@ -172,10 +193,6 @@ Supported operations:
 	recordVideo [--codec=<codec>] [--display=<display>] [--mask=<policy>] [--force] <file or url>
 	    Records the display to a QuickTime movie at the specified file or url.
 	    --codec      Specifies the codec type: "h264" or "hevc". Default is "hevc".
-
-	    --display    iOS: supports "internal" or "external". Default is "internal".
-	                 tvOS: supports only "external"
-	                 watchOS: supports only "internal"
 
 	    --mask       For non-rectangular displays, handle the mask by policy:
 	                 ignored: The mask is ignored and the unmasked framebuffer is saved.
@@ -193,15 +210,21 @@ Supported operations:
 	    Saves a screenshot as a PNG to the specified file or url(use "-" for stdout).
 	    --type       Can be "png", "tiff", "bmp", "gif", "jpeg". Default is png.
 
-	    --display    iOS: supports "internal" or "external". Default is "internal".
-	                 tvOS: supports only "external"
-	                 watchOS: supports only "internal"
-
-	                 You may also specify a port by UUID
 	    --mask       For non-rectangular displays, handle the mask by policy:
 	                 ignored: The mask is ignored and the unmasked framebuffer is saved.
 	                 alpha: The mask is used as premultiplied alpha.
 	                 black: The mask is rendered black.
+
+	screenConfig [--display=<display>] <subcommand> [arguments]
+	    Manage device screen configuration.
+
+	    power <on|off>
+	        Set the power state of a screen.
+
+	    geometry <width>x<height>[@<scale>]
+	        Change the geometry of a screen.
+	        The width and height must be compatible with the screen's current mode.
+	        If @<scale> is specified, a mode with that scale factor will be selected.
 
 Example:
 	Save a screenshot of the booted device to screenshot.png:
@@ -226,8 +249,9 @@ Usage: simctl keychain <device> <action> [arguments]
 
 xcrun simctl help launch
 Launch an application by identifier on a device.
-Usage: simctl launch [-w | --wait-for-debugger] [--console|--console-pty] [--stdout=<path>] [--stderr=<path>] [--terminate-running-process] <device> <app bundle identifier> [<argv 1> <argv 2> ... <argv n>]
+Usage: simctl launch [-w | --wait-for-debugger] [-a <arch> | --arch=<arch>] [--console|--console-pty] [--stdout=<path>] [--stderr=<path>] [--terminate-running-process] [--checked-allocations] <device> <app bundle identifier> [<argv 1> <argv 2> ... <argv n>]
 
+	--arch Specify an architecture (x86_64 or arm64) to use when spawning a universal binary.  Requires runtime version 26 or newer.
 	--console Block and print the application's stdout and stderr to the current terminal.
 		Signals received by simctl are passed through to the application.
 		(Cannot be combined with --stdout or --stderr)
@@ -237,19 +261,24 @@ Usage: simctl launch [-w | --wait-for-debugger] [--console|--console-pty] [--std
 	--stdout=<path> Redirect the application's standard output to a file.
 	--stderr=<path> Redirect the application's standard error to a file.
 	--terminate-running-process Terminate any running copy of the application.
+	--checked-allocations Launch the app with checked allocations enabled (if supported).
 		Note: Log output is often directed to stderr, not stdout.
 
 If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
 
 xcrun simctl help list
 List available devices, device types, runtimes, or device pairs.
-Usage: simctl list [-j | --json] [-e | --no-escape-slashes] [-v] [devices|devicetypes|runtimes|pairs] [<search term>|available]
--j     Print as JSON
+Usage: simctl list [-j | --json] [--json-fd=<fd>] [--json-output=<file path>] [-e | --no-escape-slashes] [-v] [devices|devicetypes|runtimes|pairs] [<search term>|available]
+-j     Print as JSON (optionally specify a file descriptor with --json-fd or file path with --json-output)
 -e     Encode slashes without escapes in JSON output
 -v     More verbose output
 
 Specify one of 'devices', 'devicetypes', 'runtimes', or 'pairs' to list only items of that type. If a type filter is specified you may also specify a search term. Search terms use a simple case-insensitive contains check against the item's description. You may use the search term 'available' to only list available items.
 
+
+xcrun simctl help listapps
+Show the installed applications.
+Usage: simctl listapps <device>
 
 xcrun simctl help location
 Control a device's simulated location
@@ -322,6 +351,17 @@ Usage: simctl pbsync [-pv] <source device or "host"> <destination device or "hos
 
  -p causes simctl to use promise data for secondary types.  simctl will continue to run to provide that promise data until something else replaces it on the pasteboard.
 
+xcrun simctl help personalization
+Provides utility when working with personalization manifests
+Usage: simctl personalization <action> [arguments]
+    personalize <identifier> - Personalizes the specified runtime generating a new personalization manifest.
+    remove-manifest <filename> - Removes the specified personalization manifest file from /Library/Developer/CoreSimulator/Cryptex/Personalization
+    remove-all-manifests - Removes all of the personalization manifests from /Library/Developer/CoreSimulator/Cryptex/Personalization
+    remove-personalization <id> - Removes the personalization for the runtime and remounts it.
+    revoke-manifests - Revokes personalization manifests requiring all runtime cryptex mounts to be re-personalized.
+    scan-and-personalize - Scans for any simulator runtimes that may need to have their personalization manifests updated, updates them, and remounts them as a cryptex.
+
+
 xcrun simctl help privacy
 Grant, revoke, or reset privacy and permissions
 Usage: simctl privacy <device> <action> <service> [<bundle identifier>]
@@ -377,6 +417,14 @@ Only application remote push notifications are supported. VoIP, Complication, Fi
 
 
 
+xcrun simctl help reboot
+Reboot a device.
+Usage: simctl reboot <device>
+
+Shuts down the device and boots it again.
+
+If you want to set environment variables in the resulting environment, set them in the calling environment with a SIMCTL_CHILD_ prefix.
+
 xcrun simctl help rename
 Rename a device.
 Usage: simctl rename <device> <name>
@@ -397,27 +445,45 @@ Supported Operations:
 	     --async | -a
 	          Print the UUID of the new image then exit, do not wait on the results of the add operation.
 
-	delete (<identifier>|--notUsedSinceDays <days>) [--dry-run]
+	delete (<identifier>|--notUsedSinceDays <days>|--unusable|--outdated) [--dry-run] [--keep-asset]
 	     Delete a simulator runtime from the secure storage area. If runtime is a disk image
 	     any booted simulators are shutdown and the disk is unmounted first.
 	     Use the alias 'all' to delete all images.
 
 	     --notUsedSinceDays <days> | -d <days>
 	          Delete images not used within the past <days> days.
+	     --unusable | -u
+	          Delete images that are marked as unusable.
+	     --outdated | -o
+	          Delete runtimes that have a newer version available with the same runtime identifier.
 	     --dry-run | -n
 	          Print what images would be deleted without actually deleting anything.
+	     --keep-asset | -k
+	          Keep the associated mobile asset when deleting the runtime.
+
+	unmount <identifier>
+	     Unmount a simulator runtime disk image without deleting it. Any booted simulators
+	     using this runtime are shutdown and the disk is unmounted. The runtime remains
+	     in the system and can be remounted later.
 
 	verify <identifier>
 	     Re-verify the signature of a given runtime.
 
-	list [-v] [-j | --json]
+	list [-v] [-j | --json] [--json-fd=<fd>] [--json-output=<file path>]
 	     List runtime disk images, optionally outputting JSON to stdout.
 	     -v
 	          Print more verbose output
 	     -j
 	          Print as JSON
+	     --json-fd=<fd>
+	          Specify the file descriptor to write JSON output to
+	     --json-output=<file path>
+	          Specify the file path to write JSON output to
 
-	match list [-v] [-j | --json]
+	scan-and-mount
+	     Scans all of the runtime storage location looking for orphaned runtimes that need to be added.
+
+	match list [-v] [-j | --json] [--json-fd=<fd>] [--json-output=<file path>]
 	     List the SDK build to runtime build mapping rules for the selected Xcode.
 	     Preferred means the runtime was either bundled with Xcode, exactly matched your SDK version,
 	     or the downloadable index indicated a better match for your SDK
@@ -427,6 +493,10 @@ Supported Operations:
 	          Verbose mode. Includes the full preferred build map, user override map, and known SDK names.
 	     -j
 	          Print as JSON
+	     --json-fd=<fd>
+	          Specify the file descriptor to write JSON output to
+	     --json-output=<file path>
+	          Specify the file path to write JSON output to
 
 	match set <sdk canonical name> (<runtime build> || --default) [--sdkBuild <sdk build>]
 	     Override the SDK to runtime build mapping. This controls which build of a given runtime
@@ -446,6 +516,25 @@ Supported Operations:
 	     --sdkBuild
 	          Explicitly specify the SDK build, eg for an Xcode other than the selected Xcode.
 
+	dyld_shared_cache update (<runtime> || --all) [--force]
+	     Update the dyld shared cache for the specified runtime.  If the cache already exists, the process will
+	     immediately terminate with success unless --force was specified.  If --force is specified, any existing
+	     cache will be deleted first.
+	     
+	     Note that this operation will enqueue a request to update the specified shared cache with the system and
+	     may not immediately start creating the cache if an existing operation is already in flight.
+
+	     --all
+	          Update the shared cache for all available runtimes
+	     --force
+	          Force re-creation if the shared cache already exists
+
+	dyld_shared_cache remove (<runtime> || --all)
+	     Remove the dyld shared cache for the specified runtime.
+
+	     --all
+	          Remove the shared caches for all runtimes.
+
 
 
 xcrun simctl help shutdown
@@ -456,10 +545,11 @@ Specifying all will shut down all running devices
 
 xcrun simctl help spawn
 Spawn a process by executing a given executable on a device.
-Usage: simctl spawn [-w | --wait-for-debugger] [-s | --standalone] [-a <arch> | --arch=<arch>] <device> <path to executable> [<argv 1> <argv 2> ... <argv n>]
+Usage: simctl spawn [-w | --wait-for-debugger] [-s | --standalone] [-a <arch> | --arch=<arch>] [--checked-allocations] <device> <path to executable> [<argv 1> <argv 2> ... <argv n>]
 -w    Start the process suspended.
 -s    Use a NULL mach bootstrap port, meaning the process cannot connect to other services and does not require a booted device. (deprecated)
 -a    Specify an architecture (x86_64 or arm64) to use when spawning a universal binary.
+--checked-allocations Spawns the process with checked allocations enabled (if supported).
 
 The path to the executable is searched using the following rules:
    <path> contains no / characters: search the device's $PATH. This is similar to how most shells work, but searches the device's path instead of the host's path.
@@ -605,14 +695,6 @@ xcrun simctl help monitor
 List notifications as they arrive.
 Usage: simctl monitor 
 
-xcrun simctl help appinfo
-Show information about an installed application.
-Usage: simctl appinfo <device> <bundle identifier>
-
-xcrun simctl help listapps
-Show the installed applications.
-Usage: simctl listapps <device>
-
 xcrun simctl help bootstatus
 Checks device boot status.
 Usage: simctl bootstatus <device> [-bcd]
@@ -644,7 +726,7 @@ commands:
 	See darwinup usage for additional commands and more information.
 
 NOTE: If you install or uninstall roots, you must manually update the dyld_sim shared cache.
-      See simctl help legacyruntime for information about triggering a dyld_sim shared cache rebuild.
+      See simctl help runtime for information about forcing a dyld_sim shared cache rebuild.
 
 
 xcrun simctl help legacyruntime
@@ -652,7 +734,7 @@ Locate, copy, mount, and unmount simulator runtime disk images.
 Usage: simctl legacyruntime <operation> <arguments>
 
 Supported Operations:
-    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--use-nfs | --use-existing <path>] [--max-cache-size <size>] [--cache-path <path>]
+    mount <train-build> [--shadow <path>] [--internal | --customer] [--writable] [--no-mount] [--no-copy] [--print-only] [--use-existing <path>] [--max-cache-size <size>] [--cache-path <path>]
 	Locate a Simulator Runtime for the given train and build, copy the disk image locally, then mount it to make the runtime available to CoreSimulator.
 
 	--internal
@@ -670,8 +752,6 @@ Supported Operations:
 	--writable
 	     When mounting the disk image, do not use a shadow file: directly mount the image as writable.
 	     NOTE: You don't want this.
-	--use-nfs
-	     By default images are downloaded from NFA. If this is passed in, the image is copied from NFS instead. Note that newer images (as of SkyB) are no longer available via NFS.
 	--use-existing <path>
 	     By default images are downloaded from NFA. If this is passed in, the image specified at the provided path will be used instead of downloading one.
 	--no-mount
