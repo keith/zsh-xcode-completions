@@ -47,6 +47,8 @@ _commands() {
     'ui:get or set UI options'
     'push:send a simulated push notification'
     'privacy:grant, revoke, or reset privacy and permissions'
+    'personalization:provides utility when working with personalization manifests'
+    'reboot:reboot a device'
     'keychain:manipulate a device'"'"'s keychain'
     'addphoto:add photos to the photo library of a device'
     'addvideo:add videos to the photo library of a device'
@@ -117,7 +119,8 @@ _options() {
         ': :{FILTER=available_shutdown _devices; _pairs}' \
         '--arch=-[specify the architecture to use when booting the simulator]:arch:(arm64 x86_64)' \
         '--disabledJob=-[disables the given launchd job]' \
-        '--enabledJob=-[enables the given launchd job when it would normally be disabled]'
+        '--enabledJob=-[enables the given launchd job when it would normally be disabled]' \
+        '--checked-allocations[spawn all processes during this boot session with checked allocations enabled (if supported)]'
       ;;
 
     (shutdown)
@@ -183,11 +186,13 @@ _options() {
     (launch)
       _arguments \
         '(-w --wait-for-debugger)'{-w,--wait-for-debugger} \
+        '(-a --arch)'{-a,--arch}'[specify an architecture to use when spawning a universal binary]:arch:(x86_64 arm64)' \
         '(--console-pty --stdout --stderr)--console[block and print the application'"'"'s stdout and stderr to the current terminal]' \
         '(--console --stdout --stderr)--console-pty[block and print the application'"'"'s stdout and stderr to the current terminal via a PTY]' \
         '(--console --console-pty)--stdout=-[redirect the application'"'"'s standard output to a file]: :_files' \
         '(--console --console-pty)--stderr=-[redirect the application'"'"'s standard error to a file]: :_files' \
         '--terminate-running-process[terminate any running copy of the application]' \
+        '--checked-allocations[launch the app with checked allocations enabled (if supported)]' \
         '(-): :{FILTER=booted _devices}' \
         ': :{DEVICE=${(Q)words[CURRENT-1]} _bundle_identifiers}' \
         '*::argv:'
@@ -204,6 +209,7 @@ _options() {
         '(-w --wait-for-debugger)'{-w,--wait-for-debugger}'[start the process suspended]' \
         '(-s --standalone)'{-s,--standalone}'[use a NULL mach bootstrap port, meaning the process cannot connect to other services and does not require a booted device (deprecated)]' \
         '(-a --arch)'{-a,--arch}'[specify an architecture to use when spawning a universal binary]:arch:(x86_64 arm64)' \
+        '--checked-allocations[spawn the process with checked allocations enabled (if supported)]' \
         '(-): :{FILTER=booted _devices}' \
         ':path:_files' \
         '*::argv:'
@@ -212,6 +218,8 @@ _options() {
     (list)
       _arguments \
         '(-j --json)'{-j,--json}'[print as JSON]' \
+        '--json-fd=-[specify the file descriptor to write JSON output to]:file descriptor:' \
+        '--json-output=-[specify the file path to write JSON output to]:path:_files' \
         '(-e --no-escape-slashes)'{-e,--no-escape-slashes}'[encode slashes without escapes in JSON output]' \
         '-v[more verbose output]' \
         ':list:(devices devicetypes runtimes pairs)' \
@@ -302,6 +310,17 @@ _options() {
         ':: :{DEVICE=${(Q)words[CURRENT-3]} _bundle_identifiers}'
       ;;
 
+    (personalization)
+      _arguments \
+        ': :_personalization_actions' \
+        '*:: :_personalization_arguments'
+      ;;
+
+    (reboot)
+      _arguments \
+        ': :{FILTER=booted _devices}'
+      ;;
+
     (keychain)
       _arguments \
         ': :{FILTER=booted _devices}' \
@@ -388,9 +407,12 @@ _runtime_operations() {
   operations=(
     'add:add a runtime disk image to the secure storage area'
     'delete:delete a simulator runtime from the secure storage area'
+    'unmount:unmount a simulator runtime disk image without deleting it'
     'verify:re-verify the signature of a given runtime'
     'list:list runtime disk images'
+    'scan-and-mount:scan runtime storage for orphaned runtimes that need to be added'
     'match'
+    'dyld_shared_cache:update or remove runtime dyld shared caches'
   )
   _describe operation operations
 }
@@ -408,25 +430,36 @@ _runtime_arguments() {
     (delete)
       _arguments \
         '::identifier:_runtime_identifiers' \
-        '(-d --notUsedSinceDays)'{-d,--notUsedSinceDays}'[delete images not used within the past <days> days]:days:' \
-        '(-n --dry-run)'{-n,--dry-run}'[print what images would be deleted without actually deleting anything]'
+        '(-d --notUsedSinceDays -u --unusable -o --outdated)'{-d,--notUsedSinceDays}'[delete images not used within the past number of days]:days:' \
+        '(-d --notUsedSinceDays -u --unusable -o --outdated)'{-u,--unusable}'[delete images that are marked as unusable]' \
+        '(-d --notUsedSinceDays -u --unusable -o --outdated)'{-o,--outdated}'[delete runtimes that have a newer version available with the same runtime identifier]' \
+        '(-n --dry-run)'{-n,--dry-run}'[print what images would be deleted without actually deleting anything]' \
+        '(-k --keep-asset)'{-k,--keep-asset}'[keep the associated mobile asset when deleting the runtime]'
       ;;
 
-    (verify)
+    (unmount|verify)
       _arguments \
-        '::identifier:_runtime_identifiers'
+        ':identifier:_runtime_identifiers'
       ;;
 
     (list)
       _arguments \
         '-v[print more verbose output]' \
-        '(-j --json)'{-j,--json}'[print as JSON]'
+        '(-j --json)'{-j,--json}'[print as JSON]' \
+        '--json-fd=-[specify the file descriptor to write JSON output to]:file descriptor:' \
+        '--json-output=-[specify the file path to write JSON output to]:path:_files'
       ;;
 
     (match)
       _arguments \
         ': :_runtime_match_operations' \
         '*:: :_runtime_match_arguments'
+      ;;
+
+    (dyld_shared_cache)
+      _arguments \
+        ': :_runtime_dyld_shared_cache_operations' \
+        '*:: :_runtime_dyld_shared_cache_arguments'
       ;;
 
   esac
@@ -447,7 +480,9 @@ _runtime_match_arguments() {
     (list)
       _arguments \
         '-v[verbose mode]' \
-        '(-j --json)'{-j,--json}'[print as JSON]'
+        '(-j --json)'{-j,--json}'[print as JSON]' \
+        '--json-fd=-[specify the file descriptor to write JSON output to]:file descriptor:' \
+        '--json-output=-[specify the file path to write JSON output to]:path:_files'
       ;;
 
     (set)
@@ -467,6 +502,34 @@ _runtime_identifiers() {
     .[] | "\(.identifier):\(.runtimeIdentifier // "(\(.state) - \(.unusableSubstate): \(.unusableErrorMessage))")"
   ')"})
   _describe -V identifier identifiers
+}
+
+_runtime_dyld_shared_cache_operations() {
+  local -a operations
+  operations=(
+    'update:update the dyld shared cache for a runtime'
+    'remove:remove the dyld shared cache for a runtime'
+  )
+  _describe operation operations
+}
+
+_runtime_dyld_shared_cache_arguments() {
+  case $line[1] in
+
+    (update)
+      _arguments \
+        '(--all):runtime:_runtime_identifiers' \
+        '(1)--all[update the shared cache for all available runtimes]' \
+        '--force[force re-creation if the shared cache already exists]'
+      ;;
+
+    (remove)
+      _arguments \
+        '(--all):runtime:_runtime_identifiers' \
+        '(1)--all[remove the shared caches for all runtimes]'
+      ;;
+
+  esac
 }
 
 _location() {
@@ -523,6 +586,7 @@ _io_operations() {
     'enumerate:lists all available IO ports and descriptor states'
     'recordVideo:records the display to a QuickTime movie at the specified file or url'
     'screenshot:saves a screenshot as a PNG to the specified file or url (use "-" for stdout)'
+    'screenConfig:manage device screen configuration'
   )
   _describe operation operations
 }
@@ -538,7 +602,7 @@ _io_op_arguments() {
     (recordVideo)
       _arguments \
         '--codec=-[specifies the codec type]:codec:(h264 hevc)' \
-        '--display=-:display:(internal external)' \
+        '--display=-[specifies which display to record]:display:' \
         '--mask=-[for non-rectangular displays, handle the mask by policy]:policy:_io_record_masks' \
         '--force[force the output file to be written to, even if the file already exists]' \
         ':file or url:_files'
@@ -547,9 +611,39 @@ _io_op_arguments() {
     (screenshot)
       _arguments \
         '--type=-:type:(png tiff bmp gif jpeg)' \
-        '--display=-:display:(internal external)' \
+        '--display=-[specifies which display to record]:display:' \
         '--mask=-[for non-rectangular displays, handle the mask by policy]:policy:_io_screenshot_masks' \
         ':file or url:_files'
+      ;;
+
+    (screenConfig)
+      _arguments \
+        '--display=-[specifies which display to record]:display:' \
+        ': :_io_screen_config_operations' \
+        '*:: :_io_screen_config_arguments'
+      ;;
+
+  esac
+}
+
+_io_screen_config_operations() {
+  local -a operations
+  operations=(
+    'power:set the power state of a screen'
+    'geometry:change the geometry of a screen'
+  )
+  _describe subcommand operations
+}
+
+_io_screen_config_arguments() {
+  case $line[1] in
+
+    (power)
+      _arguments ':state:(on off)'
+      ;;
+
+    (geometry)
+      _arguments ':<width>x<height>[@<scale>]:'
       ;;
 
   esac
@@ -637,6 +731,39 @@ _ui_arguments() {
   esac
 }
 
+_personalization_actions() {
+  local -a actions
+  actions=(
+    'personalize:personalize the specified runtime and generate a new manifest'
+    'remove-manifest:remove the specified personalization manifest file'
+    'remove-all-manifests:remove all personalization manifests'
+    'remove-personalization:remove personalization for a runtime and remount it'
+    'revoke-manifests:revoke personalization manifests'
+    'scan-and-personalize:scan for runtimes whose personalization manifests need updating'
+  )
+  _describe action actions
+}
+
+_personalization_arguments() {
+  case $line[1] in
+
+    (personalize|remove-personalization)
+      _arguments ':runtime identifier:_runtime_identifiers'
+      ;;
+
+    (remove-manifest)
+      _arguments ':manifest file:_personalization_manifests'
+      ;;
+
+  esac
+}
+
+_personalization_manifests() {
+  local -a manifests
+  manifests=(/Library/Developer/CoreSimulator/Cryptex/Personalization/*.manifest(N:t))
+  _describe 'manifest file' manifests
+}
+
 _privacy_actions() {
   local -a actions
   actions=(
@@ -718,15 +845,13 @@ _legacyruntime_arguments() {
         '(--customer)--internal[(default) select the internal runtime]' \
         '(--internal)--customer[select the customer (public) runtime]' \
         '--writable[when mounting the disk image, do not use a shadow file: directly mount the image as writable]'  \
-        '(--use-existing)--use-nfs[copy image from NFS]' \
-        '(--use-nfs)--use-existing[use image specified at the provided path]:path:_files' \
+        '--use-existing[use image specified at the provided path]:path:_files' \
         '--no-mount[copy the image to the cache (if not present), but do not actually mount it]' \
         '--no-copy' \
         '--print-only[print the path to the image on the network but take no other action]' \
         '--max-cache-size:size:' \
         '--cache-path:path:_files' \
-        '--no-sparse' \
-        '--use-nfs'
+        '--no-sparse'
       ;;
 
     (unmount)

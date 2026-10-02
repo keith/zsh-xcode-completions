@@ -6,6 +6,8 @@ all: simctl.txt
 FORCE:
 
 simctl:
+	@xcrun simctl --version
+	@echo
 	xcrun simctl || true
 	@for command in $$(xcrun simctl | grep '^\t' | awk '{print $$1}'); do \
 		echo; \
@@ -33,10 +35,6 @@ simctl:
 	xcrun simctl help keyboard
 	@echo
 	xcrun simctl help monitor
-	@echo
-	xcrun simctl help appinfo
-	@echo
-	xcrun simctl help listapps
 	@echo
 	xcrun simctl help bootstatus
 	@echo
